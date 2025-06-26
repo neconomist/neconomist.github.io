@@ -1,0 +1,768 @@
+---
+title: "ベイズ統計学"
+subtitle: "理論編"
+author: "宇畑 優太（1260404）"
+date: today
+execute: 
+  echo: true
+  warning: false
+  message: true
+format: 
+  pdf:
+    fig-width: 5
+    fig-height: 3
+    toc: true
+    toc-depth: 2
+    number-sections: true
+    include-in-header:
+      - text: \setlength{\parindent}{1em}
+pdf-engine: lualatex
+documentclass: ltjsarticle 
+lang: ja
+---
+
+# 準備 {-}
+```{r global_option}
+#| include: false
+#| message: false
+
+## PDF に出力する際は cairo を使用する
+if (knitr::is_latex_output()) {
+  knitr::opts_chunk$set(dev = "cairo_pdf")
+}
+
+#パッケージの読み込み
+pacman::p_load(tidyverse, 
+               broom, 
+               coefplot, 
+               texreg,
+               bayesplot,
+               rstan,
+               rstanrm,
+               parallel,
+               posterior,
+               cmdstanr,
+               patchwork,
+               ggplot2)
+
+#日本語の設定
+if (.Platform$OS.type == "windows") { 
+  if (require(fontregisterer)) {
+    my_font <- "Yu Gothic"
+  } else {
+    my_font <- "Japan1"
+  }
+} else if (capabilities("aqua")) {
+  my_font <- "HiraginoSans-W3"
+} else {
+  my_font <- "IPAexGothic"
+}
+
+theme_set(theme_gray(base_size = 9,
+                     base_family = my_font))
+
+```
+
+
+
+# Beyes
+
+## ベイズの定理
+
+P(A$\cap$B)という同時確率を考える．確率の性質より以下の等式が成り立つ．
+$$
+\begin{aligned}
+P(A \cap B) & = P(A|B)P(B)\\
+& = P(B|A)P(A)
+\end{aligned}
+$$
+上記の等式について，$P(B)$を移行することで**ベイズの定理**が導出できる．
+$$
+ P(A|B) = \frac{P(B|A)P(A)}{P(B)}
+$$
+AとBをDと$\theta$に変えておく．
+$$
+\begin{aligned}
+P(\theta|D) &= \frac{P(D|\theta)P(\theta)}{P(D)}\\
+\mbox{事後確率} &= \frac{\mbox{尤度・事前確率}}{\mbox{周辺尤度}}
+\end{aligned}
+$$
+
+
+
+周辺尤度P(D)について，以下のように変形が可能である．
+$$
+\begin{aligned}
+\sum_{i=1}^N P(D|\theta_i)P(\theta_i) &= \frac{\sum_{i=1}^N P(D\cap\theta_i)}{P(\theta_i)} P(\theta_i) \\
+& = \sum_{i=1}^N P(D\cap\theta_i)\\
+& = P(D\cap\theta_1) + P(D\cap\theta_2) +\cdots+\ P(D\cap\theta_N)\\
+& = P(D)
+\end{aligned}
+$$
+
+:::{.callout-warning}
+## 注意
+
+わかりやすやを重視して式変形の順序を逆にしている
+:::
+
+このような変形$(\sum_{y}p(x,y) = p(x))$を**周辺化**と呼ぶ．
+
+上記の表現を用いて事後確率を再び記載する
+$$
+\begin{aligned}
+\mbox{事後確率} &= \\
+P(\theta|D) &= \frac{P(D|\theta)P(\theta)}{\sum_{i=1}^N P(D|\theta_i)P(\theta_i)}\\
+\end{aligned}
+$$
+ここで用語を整理しておく
+
+- 事前確率：データが得られる前に想定された確率
+
+- 事後確率：データが得られた後に想定する確率
+
+- ベイズ更新：ベイズの定理を用いて事前確率を事後確率に更新すること
+
+事後(事前)確率があるのなら，当然その確率の確率分布たる**事後(事前)分布**なるものも存在する．
+
+- 事前確率分布：データが得られる前に想定する分布
+
+- 事後確率分布：データが得られた後に想定する分布
+
+
+## 事後確率分布
+
+事後確率分布は以下のように表現できる．
+$$
+\begin{aligned}
+\mbox{事後確率分布} & = \frac{\mbox{尤度関数・事前確率分布}}{\mbox{周辺尤度関数}}\\
+f(\theta|D) &= \frac{f(D|\theta)\cdot f(\theta)}{f(D)}\\
+&= \frac{f(D|\theta)\cdot f(\theta)}{\int_{-\infty}^{\infty} f(D|\theta)f(\theta)d\theta}
+\end{aligned}
+$$
+上記の等式が成り立つのは，事後確率の等式が成り立つのと同じ理屈である．
+
+~~事前分布に関して何らかの想定が置けないときは**無情報事前分布**を指定する．例えば分散が非常に大きい正規分布など．分散が大きいということは，「どの値になる確率にも，満遍なく低い確率を割り当てる」という状態である．~~
+
+:::{.callout-important}
+## 2024_7_20上記を修正
+
+- 昔は確かにそのようにしていました。しかし、この方法で構成した「無情報」事前分布は全然無情報ではない（「分散が大きい」という「強い」情報がある）ので、無情報事前分布はつかってはいけません。
+
+- 複数の事前分布を使い感度分析を行う方法[^2部の6章]と，データから得られた統計量を使う方法がある．後者はstanの規定事前分布
+:::
+
+[^2部の6章]: 感度分析に関する記述は教科書の2部6章にある
+
+- 確率分布のパラメータ($\theta$)を含む部分のことを**カーネル**と呼ぶ．上記の式では分子の尤度関数・事前確率分布($f(D|\theta)\cdot f(\theta)$)に当たる．kernel($\theta$)と表記する．
+
+- 確率分布のパラメータ($\theta$)を含まない部分のことを**正規化定数**と呼ぶ．上記の式では分母の周辺尤度関数($f(D)$)に当たる．読んで字の如く**正規化**をしてくれるのである．正規化とは事後確率分布の確率密度関数の積分値を1になるように調整することであり．周辺尤度関数($f(D)$)を計算することで正規化ができる．
+
+
+:::{.callout-warning}
+## 注意
+
+詳しくは「ベイズ推論の難点」に書いた
+:::
+
+
+## Kernel($\theta$)
+
+事後分布の具体的な計算に入ってく．サンプルサイズがNのデータ${x_1, x_2,\dots ,x_N}$が得られたとする．正規分布を用いた確率モデルを想定する．
+$$
+X \sim \mbox{Normal}(\theta,1)
+$$
+計算を簡略化するために母分散は1であるとし，パラメータ$\theta$の事後分布を得ることを目指す．
+
+- 事前分布
+
+~~事前分布としては分散が$100^2$の正規分布を想定する．無情報分布というには分散が小さすぎるが，計算を簡単にするためにこの値を使う．~~
+
+:::{.callout-important}
+## 2024_7_20上記を修正
+
+- 上でコメントしたとおり、こんなに大きな分散を想定するということは、それはもはや「無」情報ではありません。
+:::
+
+
+
+この事前分布を数式で表すことにする．パラメータ$\theta$の事前分布の確率密度関数$f(\theta)$は以下のようになる
+$$
+f(\theta) = \frac{1}{\sqrt{20000\pi}}\mbox{exp}\left(-\frac{\theta^2}{20000}\right)
+$$
+~~$(x- \theta)^2$ではなく単に$\theta^2$となっているのは，事前確率分布はデータXが得られる前に想定されるものだから．（多分，，，）~~
+
+:::{.callout-important}
+## 2024_7_20上記を修正
+
+- これは誤りです。
+
+θ 〜 Normal(0, 100) （100は標準偏差）
+
+をθの事前分布と仮定しているからです。
+:::
+
+- 尤度関数
+
+尤度関数は次のように定義されている．
+
+「一般に，パラメータ$\theta$を持つ密度関数$f_x(x;\theta)$から無作為標本{$x_1,x_2,\dots,X_N$}が得られたときに，その同時密度関数を$\theta$の関数とみなして
+$$
+L(\theta | x) = f_x(x_1|\theta) f_x(x_2|\theta)\times \cdots \times f_x(x_N|\theta)
+$$
+を**尤度関数**と呼ぶ」
+
+:::{.callout-important}
+## 2024_7_20上記を修正
+
+- 他の箇所で
+(D | θ)
+
+のように表記しているので、
+(x | θ)
+
+のように縦線で書くべきです。
+（; でもいいが、一貫した書き方をすべきという意味）
+
+- 普通は
+L(θ | x) 
+
+と表記します。
+:::
+
+では，この尤度関数を数式で表現することを目指す．平均が$\theta$で分散が1である正規分布の確率密度関数は以下のようになる．
+$$
+\mbox{Normal}(X|\theta,1) = \frac{1}{\sqrt{2\pi}}\mbox{exp}\left(-\frac{(x - \theta)^2}{2}\right)
+$$
+今回はN個のデータが得られているため，尤度は「$x_1$というデータが得られる確率」$\times$「$x_2$というデータが得られる確率」$\times\cdots$とN回分の結果をかけ合わせる必要がある．律儀に書くと以下の通り
+$$
+\mbox{尤度関数} = \frac{1}{\sqrt{2\pi}}\mbox{exp}\left(-\frac{(x_1 - \theta)^2}{2}\right) \times \frac{1}{\sqrt{2\pi}}\mbox{exp}\left(-\frac{(x_2 - \theta)^2}{2}\right) \times \cdots \times \frac{1}{\sqrt{2\pi}}\mbox{exp}\left(-\frac{(x_N - \theta)^2}{2}\right)
+$$
+総乗の記号$\prod$を使い，尤度関数$f(D|\theta)$を以下のように表記する．
+$$
+f(D|\theta) = \prod_{i=1}^{N} \frac{1}{\sqrt{2\pi}}\mbox{exp}\left(-\frac{(x_i - \theta)^2}{2}\right)
+$$
+
+突然ではあるが，パラメータ$\theta$の事後確率密度関数$f(\theta|D)$は，「尤度$\times$事前分布」つまりはKernel($\theta$)に比例する．
+$$
+\begin{aligned}
+f(\theta|D)  & \propto f(D|\theta)f(\theta)\\
+& =  \left[\prod_{i=1}^{N} \frac{1}{\sqrt{2\pi}}\mbox{exp}\left(-\frac{(x_i - \theta)^2}{2}\right)\right]\cdot\left[\frac{1}{\sqrt{20000\pi}}\mbox{exp}\left(-\frac{\theta^2}{20000}\right)\right]\\
+& = \mbox{Kernel}(\theta)
+\end{aligned}
+$$
+データが得られた後であるため，Kernel($\theta$)は$\theta$の関数である．(尤度関数の定義でも似たようなことを言ってる．)
+
+分母たる周辺尤度を無視しているのは2つ理由がある．
+
+1. 周辺尤度の計算がめんどくさい
+
+2. 周辺尤度を直接求めなくても良い理由があるs
+
+## 正規化定数
+
+周辺化とは何であったかを思い出す．
+
+- 離散の場合 $\sum_{y}p(x,y) = p(x)$
+
+- 連続の場合$\int_{y}p(x,y)dy = p(x)$
+
+であった．周辺化を用いることで周辺尤度の確率密度関数$f(D)$は次のように変形できる
+$$
+\begin{aligned}
+\int_{-\infty}^{\infty} f(D|\theta)f(\theta)d\theta &= \int_{-\infty}^{\infty} \frac{f(D,\theta)}{f(\theta)} f(\theta)d\theta \\
+& = \int_{-\infty}^{\infty} f(D,\theta) d\theta \\
+& = f(D)
+\end{aligned}
+$$
+
+:::{.callout-warning}
+## 注意
+
+わかりやすやを重視して式変形の順序を逆にしている
+:::
+
+$\int_{-\infty}^{\infty} f(D|\theta)f(\theta)d\theta$を計算するのは非常に困難である．積分計算によって$\theta$が消えるためもはや$\theta$の関数ではなく，データと確率モデルが与えられた後には定数になる．
+
+## ベイズ推論の難点
+
+ベイズの定理を用いることで事後確率分布(正確にはその確率密度関数)を得ることができた
+$$
+\mbox{事後確率分布} = \frac{事前確率分布・尤度関数}{周辺尤度}= \frac{\mbox{Kernel}(\theta)}{\mbox{正規化定数}}
+$$
+
+$$
+\begin{aligned}
+f(\theta|D) &= \frac{f(D|\theta)f(\theta)}{f(D)}\\
+ &= \frac{f(D|\theta)f(\theta)}{\int_{-\infty}^{\infty} f(D|\theta)f(\theta)d\theta}\\
+ &= \frac{\left[\prod_{i=1}^{N} \frac{1}{\sqrt{2\pi}}\mbox{exp}\left(-\frac{(x_i - \theta)^2}{2}\right)\right]\cdot\left[\frac{1}{\sqrt{20000\pi}}\mbox{exp}\left(-\frac{\theta^2}{20000}\right)\right]}{\int_{-\infty}^{\infty} \left[\prod_{i=1}^{N} \frac{1}{\sqrt{2\pi}}\mbox{exp}\left(-\frac{(x_i - \theta)^2}{2}\right)\right]\cdot\left[\frac{1}{\sqrt{20000\pi}}\mbox{exp}\left(-\frac{\theta^2}{20000}\right)\right]d\theta}
+\end{aligned}
+$$
+
+ここで正規化定数の意味を思い出してほしい．
+
+:::{.callout-note}
+## 正規化定数
+
+「読んで字の如く**正規化**をしてくれるのである．正規化とは事後確率分布の確率密度関数の積分値が1になるように調整することであり．周辺尤度関数($f(D)$)を計算することで正規化ができる．」
+:::
+
+
+ここで，事後確率分布の確率密後関数を用いて「パラメータ$\Theta$がaからBの範囲に入る確率」を計算したいとする．つまり
+$$
+\begin{aligned}
+P(a \leq \Theta \leq b ) 
+&= \int_{a}^{b} f(\theta|D) d\theta\\
+&= 
+\int_{a}^{b}
+\left(
+\frac{\left[\prod_{i=1}^{N} \frac{1}{\sqrt{2\pi}}\mbox{exp}\left(-\frac{(x_i - \theta)^2}{2}\right)\right]
+\cdot
+\left[\frac{1}{\sqrt{20000\pi}}\mbox{exp}\left(-\frac{\theta^2}{20000}\right)\right]}
+{\int_{-\infty}^{\infty} \left[\prod_{i=1}^{N} \frac{1}{\sqrt{2\pi}}\mbox{exp}\left(-\frac{(x_i - \theta)^2}{2}\right)\right]\cdot\left[\frac{1}{\sqrt{20000\pi}}\mbox{exp}\left(-\frac{\theta^2}{20000}\right)\right]d\theta}
+\right)
+d\theta
+\end{aligned}
+$$
+を計算するのであるが，最後の項の分母と分子に注目してほしい．分子が分母(**正規化定数**)よりも大きい値をとることは無い,ということが見てわかる．仮に全区間で全体を積分したとしても，分母と分子は同等の値となり積分値は1になるであろうことは容易に想像がつく．事後確率分布($f(\theta|D)$)を全区間で積分した答えが1(になりそう)ということは，$f(\theta|D)$を確率密度関数として扱うことができるということである．これが**正規化定数**の意味である．
+
+ここまでの議論で事後分布を得ることに成功した．あとは積分するだけなのだが，これが非常にめんどくさい．だけでなく，できないかもしれない．それを解決してくるのが**MCMC**である．
+
+# MCMC
+
+MCMCはマルコフ連鎖モンテカルロ法を省略したものである．マルコフ連鎖を利用して乱数を生成し，その乱数を使ってモンテカルロ積分をする，という一連のプロセスを指す．
+
+議論がややこしいので，MCMCについてのおおまかな流れを先に記載する
+
+
+
+事後分布を普通の方法で積分するのはめんどくさい
+
+$\Downarrow$
+
+代わりに，モンテカルロ積分をしよう．$\frac{ \sum_{i=1}^{1000} \hat{\theta}_i } {1000}$を計算する．これで$\theta$の期待値がわかる．
+
+$\Downarrow$
+
+モンテカルロ積分をするには，事後分布に従う乱数$\hat{ \theta }$を得る必要が
+ある．
+
+$\Downarrow$
+
+
+乱数はマルコフ連鎖を利用して生成する
+
+
+
+## モンテカルロ積分
+
+MCMCを行う最大の理由は事後分布が非常に複雑な数式となってしまい，積分が困難であるからである．積分ができないということは$\theta$の期待値も計算できないということである．
+
+では，普通に積分をすることは諦めて，代わりにモンテカルロ積分をしよう．もしパラメータ$\theta$の事後分布に従う乱数$\hat{ \theta }$が1000個得られたのならば，
+$\frac{ \sum_{i=1}^{1000} \hat{\theta}_i } {1000}$を計算することで$\theta$の期待値がわかる．
+
+$$
+\int_{-\infty}^{\infty} f(\theta|D)\cdot \theta\  d\theta　
+\thickapprox
+\frac{ \sum_{i=1}^{N} \hat{\theta}_i } {N}
+$$
+ただし，
+$$
+\hat{ \theta }_i \sim \mbox{事後分布}
+$$
+では，ここからは乱数を生成する仕組みを考える．
+
+## マルコフ連鎖
+
+先述したように，乱数はマルコフ連鎖を利用して生成するのだが，このマルコフ連鎖とは一体何なのか．正体は以下の等式を満たす$[X_t]$のことである．
+$$
+P(X_t | X_{t-1},X_{t-2},\dots,X_1)=P(X_t|X_{t-1})
+$$
+
+- 左辺は，全期間にわたって結果がわかっているときの$[X_t]$の確率分布
+
+- 右辺は，1時点前の結果のみわかっているときの$[X_t]$の確率分布
+
+左辺と右辺の条件付き確率が一致するのは，マルコフ連鎖は1時点前の値しか考慮しないからである．
+
+1時点前の値を所与とした条件付き確率(つまりは右辺)のことを**遷移核**と呼ぶ．
+
+スマホを例に挙げよう．iPhoneユーザーが来期もiPhoneを購入する確率，Androidに買い換える確率，Androidユーザーが来期もAndroidを購入する確率，iPhoneに買い換える確率は以下のように遷移核が表現できる．
+$$
+\begin{aligned}
+& P(X_t = \mbox{iPhone}|X_{t-1} = \mbox{iPhone}) = 0.4\\
+& P(X_t = \mbox{Android}|X_{t-1} = \mbox{iPhone}) = 0.6\\
+& P(X_t = \mbox{Android}|X_{t-1} = \mbox{Android}) = 0.1\\
+& P(X_t = \mbox{iPhone}|X_{t-1} = \mbox{Android}) = 0.9
+\end{aligned}
+$$
+この遷移核に従いユーザー比率は変化し続ける，かと思えば途中から全体の比率は動かなくなる．このような，変化しなくった確率分布を定常分布という．
+
+行列での理解を目指す．表にまとめるとこんな感じ
+$$
+\begin{tabular}{|l|r|r|} \hline
+   前＼後 & iPhone & Android \\ \hline
+   iPhone & 0.4 & 0.6 \\
+   Android & 0.9 & 0.1 \\ \hline
+\end{tabular}
+$$
+行列にすると
+$$
+P = 
+\begin{pmatrix}
+0.4 & 0.6 \\
+0.9 & 0.1 \\
+\end{pmatrix}
+$$
+この行列をひたすら掛けまくる．
+```{r} 
+t <- 0.1　　#初期のiPhoneのシェアを表す
+a <- matrix(c(t, 1 - t,1-t,t), nrow = 2)
+a
+p <- matrix(c(0.4, 0.9,0.6, 0.1), nrow = 2)
+p #遷移核
+p1 <- a%*%p
+p1 #t=1
+p2 <- p1%*%p
+p2 #t=2
+p3 <- p2%*%p
+p3 #t=3
+p4 <- p3%*%p
+p4 #t=4
+p5 <- p4%*%p
+p5 #t=5
+p6 <- p5%*%p
+p6 #t=6
+p7 <- p6%*%p
+p7 #t=7
+```
+初期の値，シェアがいくつでっても最終的に一定の比率に落ち着くことがわかる．全体としては定常分布に落ち着くのだが，一人一人個人の乗り換え履歴に関しては完全にランダムで決まる．この履歴を得ることは，マルコフ連鎖によって得られた乱数を獲得していることに等しい．さらに，この乱数は定常分布に従っていると考えられる．
+
+ここまでの議論で，マルコフ連鎖を利用し遷移核の確率分布たる定常分布から乱数を得る方法を知った．が，我々が欲しいのは定常分布に従う乱数ではなく，事後分布に従う乱数である．
+
+整理しよう
+
+遷移核を定める
+
+$\Downarrow$
+
+遷移核の確率分布たる定常分布が得られる
+
+$\Downarrow$
+
+定常分布に従う乱数を得ることができる
+
+我々がやりたいことは，，，
+
+乱数を得たい
+
+$\Downarrow$
+
+乱数は事後分布に従って欲しい
+
+$\Downarrow$
+
+事後分布は事後確率の確率分布である
+
+$\Downarrow$
+
+遷移核をうまく設定すれば良さそう？
+
+遷移核について，iPhoneとAndroidを考えてきたが，パラメータ$\theta$は連続であると想定される．
+
+## メトロポリス・ヘイスティング法(MH法)
+
+MH法は乱数生成のアルゴリズムの一種である．ややこしいが，パラメータ$\theta$は一種類なのだが，「パラメータ$\theta$の事後分布に従う乱数$\hat{\theta}$」は複数生成される．そのため，これらを見分けるために添字を使う．乱数の初期値は$\hat{\theta} _1$ である．
+
+:::{.callout-warning}
+## 注意!!!
+
+$\hat{\theta}_1$や$\hat{\theta}_2$には**具体的な値**が入る
+:::
+
+ここからは，事後分布がKernel($\theta$)に比例するということが重要になってくる．
+$$
+f(\theta|D) \propto f(D|\theta)\ f(\theta) = \mbox{Kernel}(\theta)
+$$
+
+1. $\hat{\theta}_1$を適当に決める．本当になんでも良い   
+
+2. N(0, $\sigma^2$)に従う乱数を，別に生成する
+
+3. $\hat{\theta}_1+\mbox{乱数}$
+の値を便宜上
+${ \hat { \theta }_2}^{\mbox{提案}}$とする
+
+4. $\frac{ \mbox{Kernel}({\hat{\theta}_2}^{\mbox{提案}})} {\mbox{Kernel}(\hat{\theta}_1)} = rate$ を計算する
+    1. ここで少し解説をする.上記の計算式は$f({\hat{\theta}_2}^{\mbox{提案}}|D)$と$f({\hat{\theta}_1}|D)$という2つの事後確率分布の比を計算しているのである
+    2. 比をとることで共通の分母である正規化定数が消えるのである．
+    
+$$
+\begin{aligned}
+\frac{f({\hat{\theta}_2}^{\mbox{提案}}|D)}{f({\hat{\theta}_1}|D)} &= \frac{\frac{\mbox{Kernel}({\hat{\theta}_2}^{\mbox{提案}})}{\mbox{正規化定数}}}{\frac{\mbox{Kernel}({\hat{\theta}_1})}{\mbox{正規化定数}}}\\
+&= \frac{\mbox{Kernel}({\hat{\theta}_2}^{\mbox{提案}})}{\mbox{Kernel}({\hat{\theta}_1})}\\
+&=rate
+\end{aligned}
+$$
+
+
+
+5. 
+    1. もしもrateが1よりも高かったのであれば，それは提案されたパラメータの値
+$\hat{\theta}_2^{\mbox{提案}}$の方が密度が高かったということである．密度が高いということは，その値は比較的発生しやすい値であることを意味する．（1番発生しやすいであろう値($\theta$の期待値)に一歩近づいた)．なので$\hat{\theta}_2^{\mbox{提案}}$は晴れて$\hat{\theta}_2$になるのである．提案の文字が消えて，正式に乱数と認められた
+    2. もしもrateが1よりも小さかったのであれば，
+        - 確率rateで$\hat{\theta}_2^{\mbox{提案}}$が$\hat{\theta}_2$になる
+        - 確率(1-rate)で${\hat{\theta}_1}$が$\hat{\theta}_2$を兼任する(これらの措置をとることで，ある程度起こりやすそうな値が乱数として採用されやすいようになる)
+      
+:::{.callout-warning}
+## 再び注意!!!
+
+$\hat{\theta}_1$や$\hat{\theta}_2$には**具体的な値**が入る．混乱しないように
+::: 
+      
+6. $\hat{\theta}_2$を初期値として2.からの計算をもう一度行う
+
+7. これらを何度も行い，多数の乱数を得る．
+
+$\hat{\theta}_t$は一時点前の$\hat{\theta}_{t-1}$に基づいて得られている．つまりはマルコフ連鎖の形になっている．
+
+
+
+せっかくなので，乱数生成を繰り返した結果を見てみよう(stanで)
+```{r}
+#| results: hide
+
+#こんなデータが得られたとする
+y <- rnorm(n = 2024,mean = 2.71, sd = 3.14)      #データの生成も乱数にした
+myd <- y                                         #2024/7/20日変更
+sample_size <- length(y)
+data_list <- list(y = y, N = sample_size)
+
+
+# mcmcの実行
+
+#生成回数が50
+mcmc_result_50 <- stan(
+  file = "stan/1.stan",
+  data = data_list,
+  seed = 1,
+  iter = 50,
+  chains = 1
+)
+
+#生成回数が2000
+mcmc_result_2000 <- stan(
+  file = "stan/1.stan",
+  data = data_list,
+  seed = 1,
+  iter = 2000,
+  chains = 1
+)
+```
+
+:::{.callout-important}
+## 2024_7_20上記を修正
+
+- データ生成もシミュレーションの一部にして、ベイズ推定で正しいパラメタが推定できるかどうか確かめるとより良いですね。
+:::
+
+```{r}
+#| fig-cap: "MCMCによる乱数生成"
+trace1 <- traceplot(mcmc_result_50
+          ,pars = c("mu"),
+          inc_warmup = T)
+trace2 <- traceplot(mcmc_result_2000,
+          pars = c("mu"),
+          inc_warmup = T)
+plot(trace1/trace2)
+```
+
+定常分布に収束したとみて良いだろう．
+
+
+
+# stan
+
+なにごとも実際にやってみないと実感できない．stanで乱数を生成し，その分布を見てみよう．
+
+
+### MCMCの実行
+
+正規分布を用いた確率モデルを想定する．
+$$
+X \sim \mbox{Normal}(\theta,1)
+$$
+$\theta$を求めることを目標にする．
+
+まずはstanに統計モデルの情報を教えてあげる．(stanファイルに記述する)
+
+記述ができたらモデルをコンパイルする
+```{r}
+mu_norm <- cmdstan_model("stan/1.stan")
+```
+stanファイルの中身を見てみる
+```{r}
+mu_norm$print()
+```
+
+
+以下のようなデータが得られたとする．
+```{r}
+y <- rnorm(n = 2024,mean = 2.71, sd = 3.14)
+```
+このデータをstanに渡すためにlist形式にする．ついでに事前分布の指定もする
+```{r}
+list <- list(N = length(y),
+               y = y)
+```
+これらのデータをstanに渡して推定を行う．
+```{r}
+#| results: hide
+fit <- mu_norm$sample(
+  data = list,
+  seed = 1,
+  chains = 4,
+  refresh = 1000,
+  iter_warmup = 1000,
+  iter_sampling = 3000
+)
+```
+結果を表示する
+```{r}
+#mu
+fit$summary("mu")
+
+#sigma
+fit$summary("sigma")
+```
+
+### 可視化
+
+MCMCの役割は事後分布に従う乱数を生成することであった．まずはその乱数を取り出す
+```{r}
+post <- fit$draws() |> 
+  as_draws_df()
+glimpse(post)
+```
+こうすることで事後分布から取り出した乱数をデータフレームに格納することができた．
+
+分布が本当に収束しているのか視覚的に理解するために，トレースプロットを作る
+```{r}
+#| fig-cap: トレースプロットの図示
+
+#mu
+trace1 <- ggplot(post,
+                aes(x = .iteration,
+                    y = mu,
+                    group = as.factor(.chain))) + 
+  geom_line(aes(colour = as.factor(.chain)))+
+  ylab("mu") +
+  xlab("実行回数")
+
+#sigma
+trace2 <- ggplot(post,
+                aes(x = .iteration,
+                    y = sigma,
+                    group = as.factor(.chain))) + 
+  geom_line(aes(colour = as.factor(.chain)))+
+  ylab("sigam") +
+  xlab("実行回数")
+
+plot(trace1/trace2)
+```
+毛虫になったので問題なし．
+
+$\theta$の事後分布を確認しよう
+```{r}
+#| fig-cap: 事後分布の確認
+
+#mu
+plt1 <- ggplot(post,
+              aes(x = mu,
+                  y = after_stat(density))) +
+  geom_histogram(colour = "black")+
+  labs(x = expression(mu),
+       y = "事後確率密度")+
+  geom_vline(xintercept = 2.71,
+             color = "red")
+
+#sigma
+plt2 <- ggplot(post,
+              aes(x = sigma,
+                  y = after_stat(density))) +
+  geom_histogram(colour = "black")+
+  labs(x = expression(sigma),
+       y = "事後確率密度")+
+  geom_vline(xintercept = 3.14,
+             color = "red")
+
+plot(plt1/plt2)
+```
+ちょっとズレる．
+
+このサンプル(乱数)を使うことで平均や信用区間を求めることができる．
+```{r}
+#mu
+#平均
+mean(post$mu)
+
+#mu
+#95%信用区間
+quantile(post$mu,probs = c(0.025,0.975))
+
+#sigam
+#平均
+mean(post$sigma)
+
+#sigma
+#95%信用区間
+quantile(post$sigma,probs = c(0.025,0.975))
+```
+分布は少しずれていたが，平均と信用区間をみるとかなり近い値が出ている．
+
+
+
+
+
+
+
+
+# 補足\ 信頼区間と予測区間の違い
+
+### ベイズ信頼区間[75,119,129]
+
+**事後分布に従う乱数**を小さいものから順番に並べて，2.5%点から97.5%点に該当する範囲を並べることで求める．
+
+### 予測区間[137,178]
+
+データDが与えられた時の，将来的な観測値**pred[^pred]が従う確率分布の確率質量関数**を$f(pred|D)$とする．これが予測分布である．例えば，パラメータ$\theta$が与えられた時の観測値predの確率分布の確率質量関数は
+$f(pred|\theta)$となる．この確率質量(密度)関数はポアソン分布かもしれないし，正規分布かもしれない．$\theta$の事後分布の確率密度関数を$f(\theta|D)$とおくと，予測分布は以下のように求められる
+
+$$
+\begin{aligned}
+f(pred|D) &= \int f(pred|\theta)f(\theta|D) d\theta\\
+
+\mbox{予測分布} &= \int (\theta\mbox{が与えられてたときに}pred\mbox{が従う分布})(\theta\mbox{の事後分布})d\theta
+\end{aligned}
+$$
+この計算はめんどくさいので，mcmcを活用する．まずは$\theta$のMCMCサンプルを得る．そして，$\theta$のMCMCサンプルを母数とした確率分布(ポアソン，正規，etc,,,)に従う乱数を得る．この乱数こそが観測値predのMCMCサンプルになる．
+
+
+
+[^pred]:　predはprediction(予測)の略
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
