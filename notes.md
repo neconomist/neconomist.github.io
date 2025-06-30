@@ -5,6 +5,7 @@ permalink: /notes/
 ---
 
 # 共有資料
+## ここでは非常に正確性に欠けた議論をしています．ご了承ください
 
 - [Entropy Balancing](/notes/entropy_balancing.html)
   - エントロピーバランシングの理論の確認と実装までをしています
