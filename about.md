@@ -5,4 +5,5 @@ title: About
 
 # ABOUT
 
-ここはAboutページです。
+ここはAboutページです
+語るほどの経歴はまだないです
