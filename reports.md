@@ -1,11 +1,11 @@
 ---
 layout: page
 title: Reports
-permalink: /reports/
+permalink: /notes/
 ---
 
 # 実装レポート
 
 下記はRやQuartoで作成したレポートです。
 
-- [Entropy Balancing](/reports/entropy_balancing.html)
+- [Entropy Balancing](/notes/entropy_balancing.html)
