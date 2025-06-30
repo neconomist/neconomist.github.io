@@ -1,6 +1,6 @@
 ---
 layout: page
-title: Reports
+title: Notes
 permalink: /notes/
 ---
 
