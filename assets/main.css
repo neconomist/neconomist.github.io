@@ -4,6 +4,13 @@ body {
   font-family: "Helvetica Neue", Arial, sans-serif;
 }
 
+/* 全体幅を揃えるための共通クラス */
+.container {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 0 1em;
+}
+
 /* ヘッダー全体黒帯 */
 .site-header {
   background: #000;
@@ -11,12 +18,13 @@ body {
   padding: 1em 0;
 }
 
-.site-header .wrapper {
+.site-header .container {
   display: flex;
   justify-content: space-between;
   align-items: center;
 }
 
+/* タイトル */
 .site-header h1 {
   margin: 0;
   font-size: 1.8em;
@@ -46,13 +54,7 @@ body {
 }
 
 /* コンテンツボックス */
-.wrapper {
-  max-width: 960px;
-  margin: 0 auto;
-  padding: 0 1em;
-}
-
-.page-content .wrapper {
+.page-content .container {
   background: white;
   border: 1px solid #ccc;
   border-radius: 6px;
@@ -69,10 +71,7 @@ body {
   margin-top: 3em;
 }
 
-.site-footer .wrapper {
-  max-width: 960px;
-  margin: 0 auto;
-  padding: 0 1em;
+.site-footer .container {
   text-align: right;
   font-size: 0.9em;
 }
