@@ -8,4 +8,4 @@ permalink: /reports/
 
 下記はRやQuartoで作成したレポートです。
 
-- [Entropy Balancing](../entropy_balancing.html)
+- [Entropy Balancing](/reports/entropy_balancing.html)
