@@ -4,8 +4,8 @@ body {
   font-family: "Helvetica Neue", Arial, sans-serif;
 }
 
-/* 共通の中央寄せコンテナ */
-.site-wrapper {
+/* 中央寄せコンテナ */
+.container {
   max-width: 960px;
   margin: 0 auto;
   background: white;
