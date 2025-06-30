@@ -4,76 +4,62 @@ body {
   font-family: "Helvetica Neue", Arial, sans-serif;
 }
 
-/* 全体幅 */
-.container {
+/* 共通の中央寄せコンテナ */
+.site-wrapper {
   max-width: 960px;
   margin: 0 auto;
-  padding: 0 1em;
+  background: white;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
 }
 
-/* 黒帯背景 */
+/* ヘッダー */
 .site-header {
   background: #000;
   color: white;
-  padding: 1em 0;
-}
-
-/* 黒帯中のコンテンツ中央揃え */
-.site-header .container {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  padding: 1em;
 }
 
-/* タイトル */
 .site-header h1 {
   margin: 0;
   font-size: 1.8em;
 }
+
 .site-header h1 a {
   text-decoration: none;
   color: white;
 }
 
-/* ナビゲーションタブ */
+/* ナビゲーション */
 .site-nav {
   display: flex;
   gap: 1.5em;
 }
+
 .site-nav a {
   font-size: 1.1em;
   text-decoration: none;
   color: white;
   padding: 0.4em 0.6em;
 }
+
 .site-nav a:hover {
   background: #444;
   border-radius: 4px;
 }
 
-/* コンテンツボックス */
-.page-content .container {
-  background: white;
-  border: 1px solid #ccc;
-  border-radius: 6px;
+/* コンテンツ */
+.site-content {
   padding: 2em;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-  margin-top: 2em;
 }
 
-/* 灰帯背景 */
+/* フッター */
 .site-footer {
   background: #444;
   color: white;
-  padding: 1em 0;
-  margin-top: 3em;
-}
-
-/* 灰帯の中を中央寄せ */
-.site-footer .container {
-  max-width: 960px;
-  margin: 0 auto;
-  padding: 0 1em;
+  padding: 1em;
   text-align: right;
   font-size: 0.9em;
 }
