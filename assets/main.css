@@ -1,16 +1,33 @@
 body {
   background: #eee;
+  font-family: "Helvetica Neue", Arial, sans-serif;
+  margin: 0;
+}
+
+.site-header {
+  border-bottom: 1px solid #ccc;
+  padding: 1em 0;
+}
+
+.site-header .wrapper {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.site-header h1 a {
+  text-decoration: none;
+  color: #4b0082;
+  font-size: 1.8em;
 }
 
 .site-nav {
   display: flex;
-  gap: 1em;
-  justify-content: flex-end;
-  align-items: center;
+  gap: 1.5em;
 }
 
 .site-nav a {
-  font-size: 1.4em;
+  font-size: 1.2em;
   padding: 0.5em 1em;
   text-decoration: none;
   color: #333;
@@ -19,18 +36,20 @@ body {
 }
 
 .site-nav a:hover {
-  background: #f0f0f0;
+  background: #ddd;
 }
 
 .wrapper {
-  max-width: 800px;
+  max-width: 960px;
   margin: 0 auto;
   padding: 0 1em;
 }
 
 .page-content .wrapper {
-  background: white;      /* 箱の背景色 */
-  border: 1px solid #ccc; /* 枠線 */
-  padding: 2em;           /* 内側の余白 */
-  box-shadow: 0 0 10px rgba(0,0,0,0.1); /* うっすら影（オシャレ） */
+  background: white;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  padding: 2em;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  margin-top: 2em;
 }
