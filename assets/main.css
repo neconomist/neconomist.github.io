@@ -1,0 +1,11 @@
+.site-nav a {
+  font-size: 1.4em;   /* ← 文字を大きく */
+  padding: 0.5em 1em; /* ← 余白を増やす */
+  display: inline-block;
+  text-decoration: none;
+}
+
+.site-nav a:hover {
+  background-color: #eee; /* ホバーで背景色 */
+  border-radius: 4px;
+}
