@@ -4,19 +4,21 @@ body {
   font-family: "Helvetica Neue", Arial, sans-serif;
 }
 
-/* 幅制限と中央寄せ */
+/* 全体幅 */
 .container {
   max-width: 960px;
   margin: 0 auto;
   padding: 0 1em;
 }
 
-/* 黒帯 */
+/* 黒帯背景 */
 .site-header {
   background: #000;
   color: white;
   padding: 1em 0;
 }
+
+/* 黒帯中のコンテンツ中央揃え */
 .site-header .container {
   display: flex;
   justify-content: space-between;
@@ -33,7 +35,7 @@ body {
   color: white;
 }
 
-/* ナビゲーション */
+/* ナビゲーションタブ */
 .site-nav {
   display: flex;
   gap: 1.5em;
@@ -49,24 +51,29 @@ body {
   border-radius: 4px;
 }
 
-/* コンテンツ */
+/* コンテンツボックス */
 .page-content .container {
   background: white;
   border: 1px solid #ccc;
   border-radius: 6px;
   padding: 2em;
   box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-  margin-top: 0;
+  margin-top: 2em;
 }
 
-/* フッター */
+/* 灰帯背景 */
 .site-footer {
   background: #444;
   color: white;
   padding: 1em 0;
-  margin-top: 0;
+  margin-top: 3em;
 }
+
+/* 灰帯の中を中央寄せ */
 .site-footer .container {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 0 1em;
   text-align: right;
   font-size: 0.9em;
 }
