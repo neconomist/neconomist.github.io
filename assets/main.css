@@ -21,3 +21,9 @@ body {
 .site-nav a:hover {
   background: #f0f0f0;
 }
+
+.wrapper {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 0 1em;
+}
