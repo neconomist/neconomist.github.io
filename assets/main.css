@@ -1,11 +1,13 @@
 body {
+  margin: 0;
   background: #eee;
   font-family: "Helvetica Neue", Arial, sans-serif;
-  margin: 0;
 }
 
+/* ヘッダー全体黒帯 */
 .site-header {
-  border-bottom: 1px solid #ccc;
+  background: #000;
+  color: white;
   padding: 1em 0;
 }
 
@@ -15,30 +17,35 @@ body {
   align-items: center;
 }
 
-.site-header h1 a {
-  text-decoration: none;
-  color: #4b0082;
+.site-header h1 {
+  margin: 0;
   font-size: 1.8em;
 }
 
+.site-header h1 a {
+  text-decoration: none;
+  color: white;
+}
+
+/* ナビゲーションタブ */
 .site-nav {
   display: flex;
   gap: 1.5em;
 }
 
 .site-nav a {
-  font-size: 1.2em;
-  padding: 0.5em 1em;
+  font-size: 1.1em;
   text-decoration: none;
-  color: #333;
-  border-radius: 4px;
-  transition: background 0.2s;
+  color: white;
+  padding: 0.4em 0.6em;
 }
 
 .site-nav a:hover {
-  background: #ddd;
+  background: #444;
+  border-radius: 4px;
 }
 
+/* コンテンツボックス */
 .wrapper {
   max-width: 960px;
   margin: 0 auto;
@@ -48,8 +55,24 @@ body {
 .page-content .wrapper {
   background: white;
   border: 1px solid #ccc;
-  border-radius: 8px;
+  border-radius: 6px;
   padding: 2em;
   box-shadow: 0 2px 8px rgba(0,0,0,0.1);
   margin-top: 2em;
+}
+
+/* フッター */
+.site-footer {
+  background: #444;
+  color: white;
+  padding: 1em 0;
+  margin-top: 3em;
+}
+
+.site-footer .wrapper {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 0 1em;
+  text-align: right;
+  font-size: 0.9em;
 }
