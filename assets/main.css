@@ -1,3 +1,23 @@
 body {
-  background: #fce4ec; /* テスト用のピンク背景 */
+  background: white; /* 元に戻す */
+}
+
+.site-nav {
+  display: flex;
+  gap: 1em;
+  justify-content: flex-end;
+  align-items: center;
+}
+
+.site-nav a {
+  font-size: 1.4em;
+  padding: 0.5em 1em;
+  text-decoration: none;
+  color: #333;
+  border-radius: 4px;
+  transition: background 0.2s;
+}
+
+.site-nav a:hover {
+  background: #f0f0f0;
 }
