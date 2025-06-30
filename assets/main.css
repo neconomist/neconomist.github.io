@@ -63,3 +63,22 @@ body {
   text-align: right;
   font-size: 0.9em;
 }
+
+.site-footer .footer-inner {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 0 1em;
+  display: flex;
+  justify-content: space-between; /* 左右に分ける */
+  align-items: center;
+  font-size: 0.9em;
+}
+
+.site-footer .footer-inner a {
+  color: white;
+  text-decoration: none;
+}
+
+.site-footer .footer-inner a:hover {
+  text-decoration: underline;
+}
