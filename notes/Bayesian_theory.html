@@ -1,0 +1,1348 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.7.32">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="ネコノミスト">
+<meta name="dcterms.date" content="2025-06-30">
+
+<title>ベイズ統計学</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="Bayesian_theory_files/libs/clipboard/clipboard.min.js"></script>
+<script src="Bayesian_theory_files/libs/quarto-html/quarto.js" type="module"></script>
+<script src="Bayesian_theory_files/libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="Bayesian_theory_files/libs/quarto-html/popper.min.js"></script>
+<script src="Bayesian_theory_files/libs/quarto-html/tippy.umd.min.js"></script>
+<script src="Bayesian_theory_files/libs/quarto-html/anchor.min.js"></script>
+<link href="Bayesian_theory_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="Bayesian_theory_files/libs/quarto-html/quarto-syntax-highlighting-37eea08aefeeee20ff55810ff984fec1.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="Bayesian_theory_files/libs/bootstrap/bootstrap.min.js"></script>
+<link href="Bayesian_theory_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="Bayesian_theory_files/libs/bootstrap/bootstrap-8a894fcc3cb5e37eb5bf30def131be2f.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN") {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+</head>
+
+<body class="quarto-light">
+
+<div id="quarto-content" class="page-columns page-rows-contents page-layout-article">
+<div id="quarto-margin-sidebar" class="sidebar margin-sidebar zindex-bottom">
+</div>
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">ベイズ統計学</h1>
+<p class="subtitle lead">理論編</p>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    <div>
+    <div class="quarto-title-meta-heading">Author</div>
+    <div class="quarto-title-meta-contents">
+             <p>ネコノミスト </p>
+          </div>
+  </div>
+    
+    <div>
+    <div class="quarto-title-meta-heading">Published</div>
+    <div class="quarto-title-meta-contents">
+      <p class="date">June 30, 2025</p>
+    </div>
+  </div>
+  
+    
+  </div>
+  
+
+
+</header>
+
+<nav id="TOC" role="doc-toc">
+    <h2 id="toc-title">Table of contents</h2>
+   
+  <ul>
+  <li><a href="#準備" id="toc-準備">準備</a></li>
+  <li><a href="#beyes" id="toc-beyes"><span class="header-section-number">1</span> Beyes</a>
+  <ul>
+  <li><a href="#ベイズの定理" id="toc-ベイズの定理"><span class="header-section-number">1.1</span> ベイズの定理</a></li>
+  <li><a href="#事後確率分布" id="toc-事後確率分布"><span class="header-section-number">1.2</span> 事後確率分布</a></li>
+  <li><a href="#kerneltheta" id="toc-kerneltheta"><span class="header-section-number">1.3</span> Kernel(<span class="math inline">\(\theta\)</span>)</a></li>
+  <li><a href="#正規化定数" id="toc-正規化定数"><span class="header-section-number">1.4</span> 正規化定数</a></li>
+  <li><a href="#ベイズ推論の難点" id="toc-ベイズ推論の難点"><span class="header-section-number">1.5</span> ベイズ推論の難点</a></li>
+  </ul></li>
+  <li><a href="#mcmc" id="toc-mcmc"><span class="header-section-number">2</span> MCMC</a>
+  <ul>
+  <li><a href="#モンテカルロ積分" id="toc-モンテカルロ積分"><span class="header-section-number">2.1</span> モンテカルロ積分</a></li>
+  <li><a href="#マルコフ連鎖" id="toc-マルコフ連鎖"><span class="header-section-number">2.2</span> マルコフ連鎖</a></li>
+  <li><a href="#メトロポリスヘイスティング法mh法" id="toc-メトロポリスヘイスティング法mh法"><span class="header-section-number">2.3</span> メトロポリス・ヘイスティング法(MH法)</a></li>
+  </ul></li>
+  <li><a href="#stan" id="toc-stan"><span class="header-section-number">3</span> stan</a>
+  <ul>
+  <li><a href="#mcmcの実行" id="toc-mcmcの実行"><span class="header-section-number">3.0.1</span> MCMCの実行</a></li>
+  <li><a href="#可視化" id="toc-可視化"><span class="header-section-number">3.0.2</span> 可視化</a></li>
+  </ul></li>
+  <li><a href="#補足-信頼区間と予測区間の違い" id="toc-補足-信頼区間と予測区間の違い"><span class="header-section-number">4</span> 補足&nbsp;信頼区間と予測区間の違い</a>
+  <ul>
+  <li><a href="#ベイズ信頼区間75119129" id="toc-ベイズ信頼区間75119129"><span class="header-section-number">4.0.1</span> ベイズ信頼区間[75,119,129]</a></li>
+  <li><a href="#予測区間137178" id="toc-予測区間137178"><span class="header-section-number">4.0.2</span> 予測区間[137,178]</a></li>
+  </ul></li>
+  </ul>
+</nav>
+<section id="準備" class="level1 unnumbered">
+<h1 class="unnumbered">準備</h1>
+</section>
+<section id="beyes" class="level1" data-number="1">
+<h1 data-number="1"><span class="header-section-number">1</span> Beyes</h1>
+<section id="ベイズの定理" class="level2" data-number="1.1">
+<h2 data-number="1.1" class="anchored" data-anchor-id="ベイズの定理"><span class="header-section-number">1.1</span> ベイズの定理</h2>
+<p>P(A<span class="math inline">\(\cap\)</span>B)という同時確率を考える．確率の性質より以下の等式が成り立つ． <span class="math display">\[
+\begin{aligned}
+P(A \cap B) &amp; = P(A|B)P(B)\\
+&amp; = P(B|A)P(A)
+\end{aligned}
+\]</span> 上記の等式について，<span class="math inline">\(P(B)\)</span>を移行することで<strong>ベイズの定理</strong>が導出できる． <span class="math display">\[
+P(A|B) = \frac{P(B|A)P(A)}{P(B)}
+\]</span> AとBをDと<span class="math inline">\(\theta\)</span>に変えておく． <span class="math display">\[
+\begin{aligned}
+P(\theta|D) &amp;= \frac{P(D|\theta)P(\theta)}{P(D)}\\
+\mbox{事後確率} &amp;= \frac{\mbox{尤度・事前確率}}{\mbox{周辺尤度}}
+\end{aligned}
+\]</span></p>
+<p>周辺尤度P(D)について，以下のように変形が可能である． <span class="math display">\[
+\begin{aligned}
+\sum_{i=1}^N P(D|\theta_i)P(\theta_i) &amp;= \frac{\sum_{i=1}^N P(D\cap\theta_i)}{P(\theta_i)} P(\theta_i) \\
+&amp; = \sum_{i=1}^N P(D\cap\theta_i)\\
+&amp; = P(D\cap\theta_1) + P(D\cap\theta_2) +\cdots+\ P(D\cap\theta_N)\\
+&amp; = P(D)
+\end{aligned}
+\]</span></p>
+<div class="callout callout-style-default callout-warning callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+注意
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>わかりやすやを重視して式変形の順序を逆にしている</p>
+</div>
+</div>
+<p>このような変形<span class="math inline">\((\sum_{y}p(x,y) = p(x))\)</span>を<strong>周辺化</strong>と呼ぶ．</p>
+<p>上記の表現を用いて事後確率を再び記載する <span class="math display">\[
+\begin{aligned}
+\mbox{事後確率} &amp;= \\
+P(\theta|D) &amp;= \frac{P(D|\theta)P(\theta)}{\sum_{i=1}^N P(D|\theta_i)P(\theta_i)}\\
+\end{aligned}
+\]</span> ここで用語を整理しておく</p>
+<ul>
+<li><p>事前確率：データが得られる前に想定された確率</p></li>
+<li><p>事後確率：データが得られた後に想定する確率</p></li>
+<li><p>ベイズ更新：ベイズの定理を用いて事前確率を事後確率に更新すること</p></li>
+</ul>
+<p>事後(事前)確率があるのなら，当然その確率の確率分布たる<strong>事後(事前)分布</strong>なるものも存在する．</p>
+<ul>
+<li><p>事前確率分布：データが得られる前に想定する分布</p></li>
+<li><p>事後確率分布：データが得られた後に想定する分布</p></li>
+</ul>
+</section>
+<section id="事後確率分布" class="level2" data-number="1.2">
+<h2 data-number="1.2" class="anchored" data-anchor-id="事後確率分布"><span class="header-section-number">1.2</span> 事後確率分布</h2>
+<p>事後確率分布は以下のように表現できる． <span class="math display">\[
+\begin{aligned}
+\mbox{事後確率分布} &amp; = \frac{\mbox{尤度関数・事前確率分布}}{\mbox{周辺尤度関数}}\\
+f(\theta|D) &amp;= \frac{f(D|\theta)\cdot f(\theta)}{f(D)}\\
+&amp;= \frac{f(D|\theta)\cdot f(\theta)}{\int_{-\infty}^{\infty} f(D|\theta)f(\theta)d\theta}
+\end{aligned}
+\]</span> 上記の等式が成り立つのは，事後確率の等式が成り立つのと同じ理屈である．</p>
+<p><del>事前分布に関して何らかの想定が置けないときは<strong>無情報事前分布</strong>を指定する．例えば分散が非常に大きい正規分布など．分散が大きいということは，「どの値になる確率にも，満遍なく低い確率を割り当てる」という状態である．</del></p>
+<div class="callout callout-style-default callout-important callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+2024_7_20上記を修正
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<ul>
+<li><p>昔は確かにそのようにしていました。しかし、この方法で構成した「無情報」事前分布は全然無情報ではない（「分散が大きい」という「強い」情報がある）ので、無情報事前分布はつかってはいけません。</p></li>
+<li><p>複数の事前分布を使い感度分析を行う方法<a href="#fn1" class="footnote-ref" id="fnref1" role="doc-noteref"><sup>1</sup></a>と，データから得られた統計量を使う方法がある．後者はstanの規定事前分布</p></li>
+</ul>
+</div>
+</div>
+<ul>
+<li><p>確率分布のパラメータ(<span class="math inline">\(\theta\)</span>)を含む部分のことを<strong>カーネル</strong>と呼ぶ．上記の式では分子の尤度関数・事前確率分布(<span class="math inline">\(f(D|\theta)\cdot f(\theta)\)</span>)に当たる．kernel(<span class="math inline">\(\theta\)</span>)と表記する．</p></li>
+<li><p>確率分布のパラメータ(<span class="math inline">\(\theta\)</span>)を含まない部分のことを<strong>正規化定数</strong>と呼ぶ．上記の式では分母の周辺尤度関数(<span class="math inline">\(f(D)\)</span>)に当たる．読んで字の如く<strong>正規化</strong>をしてくれるのである．正規化とは事後確率分布の確率密度関数の積分値を1になるように調整することであり．周辺尤度関数(<span class="math inline">\(f(D)\)</span>)を計算することで正規化ができる．</p></li>
+</ul>
+<div class="callout callout-style-default callout-warning callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+注意
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>詳しくは「ベイズ推論の難点」に書いた</p>
+</div>
+</div>
+</section>
+<section id="kerneltheta" class="level2" data-number="1.3">
+<h2 data-number="1.3" class="anchored" data-anchor-id="kerneltheta"><span class="header-section-number">1.3</span> Kernel(<span class="math inline">\(\theta\)</span>)</h2>
+<p>事後分布の具体的な計算に入ってく．サンプルサイズがNのデータ<span class="math inline">\({x_1, x_2,\dots ,x_N}\)</span>が得られたとする．正規分布を用いた確率モデルを想定する． <span class="math display">\[
+X \sim \mbox{Normal}(\theta,1)
+\]</span> 計算を簡略化するために母分散は1であるとし，パラメータ<span class="math inline">\(\theta\)</span>の事後分布を得ることを目指す．</p>
+<ul>
+<li>事前分布</li>
+</ul>
+<p><del>事前分布としては分散が<span class="math inline">\(100^2\)</span>の正規分布を想定する．無情報分布というには分散が小さすぎるが，計算を簡単にするためにこの値を使う．</del></p>
+<div class="callout callout-style-default callout-important callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+2024_7_20上記を修正
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<ul>
+<li>上でコメントしたとおり、こんなに大きな分散を想定するということは、それはもはや「無」情報ではありません。</li>
+</ul>
+</div>
+</div>
+<p>この事前分布を数式で表すことにする．パラメータ<span class="math inline">\(\theta\)</span>の事前分布の確率密度関数<span class="math inline">\(f(\theta)\)</span>は以下のようになる <span class="math display">\[
+f(\theta) = \frac{1}{\sqrt{20000\pi}}\mbox{exp}\left(-\frac{\theta^2}{20000}\right)
+\]</span> <del><span class="math inline">\((x- \theta)^2\)</span>ではなく単に<span class="math inline">\(\theta^2\)</span>となっているのは，事前確率分布はデータXが得られる前に想定されるものだから．（多分，，，）</del></p>
+<div class="callout callout-style-default callout-important callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+2024_7_20上記を修正
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<ul>
+<li>これは誤りです。</li>
+</ul>
+<p>θ 〜 Normal(0, 100) （100は標準偏差）</p>
+<p>をθの事前分布と仮定しているからです。</p>
+</div>
+</div>
+<ul>
+<li>尤度関数</li>
+</ul>
+<p>尤度関数は次のように定義されている．</p>
+<p>「一般に，パラメータ<span class="math inline">\(\theta\)</span>を持つ密度関数<span class="math inline">\(f_x(x;\theta)\)</span>から無作為標本{<span class="math inline">\(x_1,x_2,\dots,X_N\)</span>}が得られたときに，その同時密度関数を<span class="math inline">\(\theta\)</span>の関数とみなして <span class="math display">\[
+L(\theta | x) = f_x(x_1|\theta) f_x(x_2|\theta)\times \cdots \times f_x(x_N|\theta)
+\]</span> を<strong>尤度関数</strong>と呼ぶ」</p>
+<div class="callout callout-style-default callout-important callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+2024_7_20上記を修正
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<ul>
+<li>他の箇所で (D | θ)</li>
+</ul>
+<p>のように表記しているので、 (x | θ)</p>
+<p>のように縦線で書くべきです。 （; でもいいが、一貫した書き方をすべきという意味）</p>
+<ul>
+<li>普通は L(θ | x)</li>
+</ul>
+<p>と表記します。</p>
+</div>
+</div>
+<p>では，この尤度関数を数式で表現することを目指す．平均が<span class="math inline">\(\theta\)</span>で分散が1である正規分布の確率密度関数は以下のようになる． <span class="math display">\[
+\mbox{Normal}(X|\theta,1) = \frac{1}{\sqrt{2\pi}}\mbox{exp}\left(-\frac{(x - \theta)^2}{2}\right)
+\]</span> 今回はN個のデータが得られているため，尤度は「<span class="math inline">\(x_1\)</span>というデータが得られる確率」<span class="math inline">\(\times\)</span>「<span class="math inline">\(x_2\)</span>というデータが得られる確率」<span class="math inline">\(\times\cdots\)</span>とN回分の結果をかけ合わせる必要がある．律儀に書くと以下の通り <span class="math display">\[
+\mbox{尤度関数} = \frac{1}{\sqrt{2\pi}}\mbox{exp}\left(-\frac{(x_1 - \theta)^2}{2}\right) \times \frac{1}{\sqrt{2\pi}}\mbox{exp}\left(-\frac{(x_2 - \theta)^2}{2}\right) \times \cdots \times \frac{1}{\sqrt{2\pi}}\mbox{exp}\left(-\frac{(x_N - \theta)^2}{2}\right)
+\]</span> 総乗の記号<span class="math inline">\(\prod\)</span>を使い，尤度関数<span class="math inline">\(f(D|\theta)\)</span>を以下のように表記する． <span class="math display">\[
+f(D|\theta) = \prod_{i=1}^{N} \frac{1}{\sqrt{2\pi}}\mbox{exp}\left(-\frac{(x_i - \theta)^2}{2}\right)
+\]</span></p>
+<p>突然ではあるが，パラメータ<span class="math inline">\(\theta\)</span>の事後確率密度関数<span class="math inline">\(f(\theta|D)\)</span>は，「尤度<span class="math inline">\(\times\)</span>事前分布」つまりはKernel(<span class="math inline">\(\theta\)</span>)に比例する． <span class="math display">\[
+\begin{aligned}
+f(\theta|D)  &amp; \propto f(D|\theta)f(\theta)\\
+&amp; =  \left[\prod_{i=1}^{N} \frac{1}{\sqrt{2\pi}}\mbox{exp}\left(-\frac{(x_i - \theta)^2}{2}\right)\right]\cdot\left[\frac{1}{\sqrt{20000\pi}}\mbox{exp}\left(-\frac{\theta^2}{20000}\right)\right]\\
+&amp; = \mbox{Kernel}(\theta)
+\end{aligned}
+\]</span> データが得られた後であるため，Kernel(<span class="math inline">\(\theta\)</span>)は<span class="math inline">\(\theta\)</span>の関数である．(尤度関数の定義でも似たようなことを言ってる．)</p>
+<p>分母たる周辺尤度を無視しているのは2つ理由がある．</p>
+<ol type="1">
+<li><p>周辺尤度の計算がめんどくさい</p></li>
+<li><p>周辺尤度を直接求めなくても良い理由があるs</p></li>
+</ol>
+</section>
+<section id="正規化定数" class="level2" data-number="1.4">
+<h2 data-number="1.4" class="anchored" data-anchor-id="正規化定数"><span class="header-section-number">1.4</span> 正規化定数</h2>
+<p>周辺化とは何であったかを思い出す．</p>
+<ul>
+<li><p>離散の場合 <span class="math inline">\(\sum_{y}p(x,y) = p(x)\)</span></p></li>
+<li><p>連続の場合<span class="math inline">\(\int_{y}p(x,y)dy = p(x)\)</span></p></li>
+</ul>
+<p>であった．周辺化を用いることで周辺尤度の確率密度関数<span class="math inline">\(f(D)\)</span>は次のように変形できる <span class="math display">\[
+\begin{aligned}
+\int_{-\infty}^{\infty} f(D|\theta)f(\theta)d\theta &amp;= \int_{-\infty}^{\infty} \frac{f(D,\theta)}{f(\theta)} f(\theta)d\theta \\
+&amp; = \int_{-\infty}^{\infty} f(D,\theta) d\theta \\
+&amp; = f(D)
+\end{aligned}
+\]</span></p>
+<div class="callout callout-style-default callout-warning callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+注意
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>わかりやすやを重視して式変形の順序を逆にしている</p>
+</div>
+</div>
+<p><span class="math inline">\(\int_{-\infty}^{\infty} f(D|\theta)f(\theta)d\theta\)</span>を計算するのは非常に困難である．積分計算によって<span class="math inline">\(\theta\)</span>が消えるためもはや<span class="math inline">\(\theta\)</span>の関数ではなく，データと確率モデルが与えられた後には定数になる．</p>
+</section>
+<section id="ベイズ推論の難点" class="level2" data-number="1.5">
+<h2 data-number="1.5" class="anchored" data-anchor-id="ベイズ推論の難点"><span class="header-section-number">1.5</span> ベイズ推論の難点</h2>
+<p>ベイズの定理を用いることで事後確率分布(正確にはその確率密度関数)を得ることができた <span class="math display">\[
+\mbox{事後確率分布} = \frac{事前確率分布・尤度関数}{周辺尤度}= \frac{\mbox{Kernel}(\theta)}{\mbox{正規化定数}}
+\]</span></p>
+<p><span class="math display">\[
+\begin{aligned}
+f(\theta|D) &amp;= \frac{f(D|\theta)f(\theta)}{f(D)}\\
+&amp;= \frac{f(D|\theta)f(\theta)}{\int_{-\infty}^{\infty} f(D|\theta)f(\theta)d\theta}\\
+&amp;= \frac{\left[\prod_{i=1}^{N} \frac{1}{\sqrt{2\pi}}\mbox{exp}\left(-\frac{(x_i - \theta)^2}{2}\right)\right]\cdot\left[\frac{1}{\sqrt{20000\pi}}\mbox{exp}\left(-\frac{\theta^2}{20000}\right)\right]}{\int_{-\infty}^{\infty} \left[\prod_{i=1}^{N} \frac{1}{\sqrt{2\pi}}\mbox{exp}\left(-\frac{(x_i - \theta)^2}{2}\right)\right]\cdot\left[\frac{1}{\sqrt{20000\pi}}\mbox{exp}\left(-\frac{\theta^2}{20000}\right)\right]d\theta}
+\end{aligned}
+\]</span></p>
+<p>ここで正規化定数の意味を思い出してほしい．</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+正規化定数
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>「読んで字の如く<strong>正規化</strong>をしてくれるのである．正規化とは事後確率分布の確率密度関数の積分値が1になるように調整することであり．周辺尤度関数(<span class="math inline">\(f(D)\)</span>)を計算することで正規化ができる．」</p>
+</div>
+</div>
+<p>ここで，事後確率分布の確率密後関数を用いて「パラメータ<span class="math inline">\(\Theta\)</span>がaからBの範囲に入る確率」を計算したいとする．つまり <span class="math display">\[
+\begin{aligned}
+P(a \leq \Theta \leq b )
+&amp;= \int_{a}^{b} f(\theta|D) d\theta\\
+&amp;=
+\int_{a}^{b}
+\left(
+\frac{\left[\prod_{i=1}^{N} \frac{1}{\sqrt{2\pi}}\mbox{exp}\left(-\frac{(x_i - \theta)^2}{2}\right)\right]
+\cdot
+\left[\frac{1}{\sqrt{20000\pi}}\mbox{exp}\left(-\frac{\theta^2}{20000}\right)\right]}
+{\int_{-\infty}^{\infty} \left[\prod_{i=1}^{N} \frac{1}{\sqrt{2\pi}}\mbox{exp}\left(-\frac{(x_i - \theta)^2}{2}\right)\right]\cdot\left[\frac{1}{\sqrt{20000\pi}}\mbox{exp}\left(-\frac{\theta^2}{20000}\right)\right]d\theta}
+\right)
+d\theta
+\end{aligned}
+\]</span> を計算するのであるが，最後の項の分母と分子に注目してほしい．分子が分母(<strong>正規化定数</strong>)よりも大きい値をとることは無い,ということが見てわかる．仮に全区間で全体を積分したとしても，分母と分子は同等の値となり積分値は1になるであろうことは容易に想像がつく．事後確率分布(<span class="math inline">\(f(\theta|D)\)</span>)を全区間で積分した答えが1(になりそう)ということは，<span class="math inline">\(f(\theta|D)\)</span>を確率密度関数として扱うことができるということである．これが<strong>正規化定数</strong>の意味である．</p>
+<p>ここまでの議論で事後分布を得ることに成功した．あとは積分するだけなのだが，これが非常にめんどくさい．だけでなく，できないかもしれない．それを解決してくるのが<strong>MCMC</strong>である．</p>
+</section>
+</section>
+<section id="mcmc" class="level1" data-number="2">
+<h1 data-number="2"><span class="header-section-number">2</span> MCMC</h1>
+<p>MCMCはマルコフ連鎖モンテカルロ法を省略したものである．マルコフ連鎖を利用して乱数を生成し，その乱数を使ってモンテカルロ積分をする，という一連のプロセスを指す．</p>
+<p>議論がややこしいので，MCMCについてのおおまかな流れを先に記載する</p>
+<p>事後分布を普通の方法で積分するのはめんどくさい</p>
+<p><span class="math inline">\(\Downarrow\)</span></p>
+<p>代わりに，モンテカルロ積分をしよう．<span class="math inline">\(\frac{ \sum_{i=1}^{1000} \hat{\theta}_i } {1000}\)</span>を計算する．これで<span class="math inline">\(\theta\)</span>の期待値がわかる．</p>
+<p><span class="math inline">\(\Downarrow\)</span></p>
+<p>モンテカルロ積分をするには，事後分布に従う乱数<span class="math inline">\(\hat{ \theta }\)</span>を得る必要が ある．</p>
+<p><span class="math inline">\(\Downarrow\)</span></p>
+<p>乱数はマルコフ連鎖を利用して生成する</p>
+<section id="モンテカルロ積分" class="level2" data-number="2.1">
+<h2 data-number="2.1" class="anchored" data-anchor-id="モンテカルロ積分"><span class="header-section-number">2.1</span> モンテカルロ積分</h2>
+<p>MCMCを行う最大の理由は事後分布が非常に複雑な数式となってしまい，積分が困難であるからである．積分ができないということは<span class="math inline">\(\theta\)</span>の期待値も計算できないということである．</p>
+<p>では，普通に積分をすることは諦めて，代わりにモンテカルロ積分をしよう．もしパラメータ<span class="math inline">\(\theta\)</span>の事後分布に従う乱数<span class="math inline">\(\hat{ \theta }\)</span>が1000個得られたのならば， <span class="math inline">\(\frac{ \sum_{i=1}^{1000} \hat{\theta}_i } {1000}\)</span>を計算することで<span class="math inline">\(\theta\)</span>の期待値がわかる．</p>
+<p><span class="math display">\[
+\int_{-\infty}^{\infty} f(\theta|D)\cdot \theta\  d\theta　
+\thickapprox
+\frac{ \sum_{i=1}^{N} \hat{\theta}_i } {N}
+\]</span> ただし， <span class="math display">\[
+\hat{ \theta }_i \sim \mbox{事後分布}
+\]</span> では，ここからは乱数を生成する仕組みを考える．</p>
+</section>
+<section id="マルコフ連鎖" class="level2" data-number="2.2">
+<h2 data-number="2.2" class="anchored" data-anchor-id="マルコフ連鎖"><span class="header-section-number">2.2</span> マルコフ連鎖</h2>
+<p>先述したように，乱数はマルコフ連鎖を利用して生成するのだが，このマルコフ連鎖とは一体何なのか．正体は以下の等式を満たす<span class="math inline">\([X_t]\)</span>のことである． <span class="math display">\[
+P(X_t | X_{t-1},X_{t-2},\dots,X_1)=P(X_t|X_{t-1})
+\]</span></p>
+<ul>
+<li><p>左辺は，全期間にわたって結果がわかっているときの<span class="math inline">\([X_t]\)</span>の確率分布</p></li>
+<li><p>右辺は，1時点前の結果のみわかっているときの<span class="math inline">\([X_t]\)</span>の確率分布</p></li>
+</ul>
+<p>左辺と右辺の条件付き確率が一致するのは，マルコフ連鎖は1時点前の値しか考慮しないからである．</p>
+<p>1時点前の値を所与とした条件付き確率(つまりは右辺)のことを<strong>遷移核</strong>と呼ぶ．</p>
+<p>スマホを例に挙げよう．iPhoneユーザーが来期もiPhoneを購入する確率，Androidに買い換える確率，Androidユーザーが来期もAndroidを購入する確率，iPhoneに買い換える確率は以下のように遷移核が表現できる． <span class="math display">\[
+\begin{aligned}
+&amp; P(X_t = \mbox{iPhone}|X_{t-1} = \mbox{iPhone}) = 0.4\\
+&amp; P(X_t = \mbox{Android}|X_{t-1} = \mbox{iPhone}) = 0.6\\
+&amp; P(X_t = \mbox{Android}|X_{t-1} = \mbox{Android}) = 0.1\\
+&amp; P(X_t = \mbox{iPhone}|X_{t-1} = \mbox{Android}) = 0.9
+\end{aligned}
+\]</span> この遷移核に従いユーザー比率は変化し続ける，かと思えば途中から全体の比率は動かなくなる．このような，変化しなくった確率分布を定常分布という．</p>
+<p>行列での理解を目指す．表にまとめるとこんな感じ</p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th style="text-align: center;">前＼後</th>
+<th style="text-align: center;">iPhone</th>
+<th style="text-align: center;">Android</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: center;">iPhone</td>
+<td style="text-align: center;">0.4</td>
+<td style="text-align: center;">0.6</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">Android</td>
+<td style="text-align: center;">0.9</td>
+<td style="text-align: center;">0.1</td>
+</tr>
+</tbody>
+</table>
+<p>行列にすると <span class="math display">\[
+P =
+\begin{pmatrix}
+0.4 &amp; 0.6 \\
+0.9 &amp; 0.1 \\
+\end{pmatrix}
+\]</span> この行列をひたすら掛けまくる．</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>t <span class="ot">&lt;-</span> <span class="fl">0.1</span>　　<span class="co">#初期のiPhoneのシェアを表す</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>a <span class="ot">&lt;-</span> <span class="fu">matrix</span>(<span class="fu">c</span>(t, <span class="dv">1</span> <span class="sc">-</span> t,<span class="dv">1</span><span class="sc">-</span>t,t), <span class="at">nrow =</span> <span class="dv">2</span>)</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>a</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>     [,1] [,2]
+[1,]  0.1  0.9
+[2,]  0.9  0.1</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>p <span class="ot">&lt;-</span> <span class="fu">matrix</span>(<span class="fu">c</span>(<span class="fl">0.4</span>, <span class="fl">0.9</span>,<span class="fl">0.6</span>, <span class="fl">0.1</span>), <span class="at">nrow =</span> <span class="dv">2</span>)</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>p <span class="co">#遷移核</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>     [,1] [,2]
+[1,]  0.4  0.6
+[2,]  0.9  0.1</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>p1 <span class="ot">&lt;-</span> a<span class="sc">%*%</span>p</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>p1 <span class="co">#t=1</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>     [,1] [,2]
+[1,] 0.85 0.15
+[2,] 0.45 0.55</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>p2 <span class="ot">&lt;-</span> p1<span class="sc">%*%</span>p</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>p2 <span class="co">#t=2</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>      [,1]  [,2]
+[1,] 0.475 0.525
+[2,] 0.675 0.325</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>p3 <span class="ot">&lt;-</span> p2<span class="sc">%*%</span>p</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>p3 <span class="co">#t=3</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>       [,1]   [,2]
+[1,] 0.6625 0.3375
+[2,] 0.5625 0.4375</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>p4 <span class="ot">&lt;-</span> p3<span class="sc">%*%</span>p</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>p4 <span class="co">#t=4</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>        [,1]    [,2]
+[1,] 0.56875 0.43125
+[2,] 0.61875 0.38125</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>p5 <span class="ot">&lt;-</span> p4<span class="sc">%*%</span>p</span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>p5 <span class="co">#t=5</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>         [,1]     [,2]
+[1,] 0.615625 0.384375
+[2,] 0.590625 0.409375</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>p6 <span class="ot">&lt;-</span> p5<span class="sc">%*%</span>p</span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>p6 <span class="co">#t=6</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>          [,1]      [,2]
+[1,] 0.5921875 0.4078125
+[2,] 0.6046875 0.3953125</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>p7 <span class="ot">&lt;-</span> p6<span class="sc">%*%</span>p</span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>p7 <span class="co">#t=7</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>          [,1]      [,2]
+[1,] 0.6039063 0.3960938
+[2,] 0.5976563 0.4023438</code></pre>
+</div>
+</div>
+<p>初期の値，シェアがいくつでっても最終的に一定の比率に落ち着くことがわかる．全体としては定常分布に落ち着くのだが，一人一人個人の乗り換え履歴に関しては完全にランダムで決まる．この履歴を得ることは，マルコフ連鎖によって得られた乱数を獲得していることに等しい．さらに，この乱数は定常分布に従っていると考えられる．</p>
+<p>ここまでの議論で，マルコフ連鎖を利用し遷移核の確率分布たる定常分布から乱数を得る方法を知った．が，我々が欲しいのは定常分布に従う乱数ではなく，事後分布に従う乱数である．</p>
+<p>整理しよう</p>
+<p>遷移核を定める</p>
+<p><span class="math inline">\(\Downarrow\)</span></p>
+<p>遷移核の確率分布たる定常分布が得られる</p>
+<p><span class="math inline">\(\Downarrow\)</span></p>
+<p>定常分布に従う乱数を得ることができる</p>
+<p>我々がやりたいことは，，，</p>
+<p>乱数を得たい</p>
+<p><span class="math inline">\(\Downarrow\)</span></p>
+<p>乱数は事後分布に従って欲しい</p>
+<p><span class="math inline">\(\Downarrow\)</span></p>
+<p>事後分布は事後確率の確率分布である</p>
+<p><span class="math inline">\(\Downarrow\)</span></p>
+<p>遷移核をうまく設定すれば良さそう？</p>
+<p>遷移核について，iPhoneとAndroidを考えてきたが，パラメータ<span class="math inline">\(\theta\)</span>は連続であると想定される．</p>
+</section>
+<section id="メトロポリスヘイスティング法mh法" class="level2" data-number="2.3">
+<h2 data-number="2.3" class="anchored" data-anchor-id="メトロポリスヘイスティング法mh法"><span class="header-section-number">2.3</span> メトロポリス・ヘイスティング法(MH法)</h2>
+<p>MH法は乱数生成のアルゴリズムの一種である．ややこしいが，パラメータ<span class="math inline">\(\theta\)</span>は一種類なのだが，「パラメータ<span class="math inline">\(\theta\)</span>の事後分布に従う乱数<span class="math inline">\(\hat{\theta}\)</span>」は複数生成される．そのため，これらを見分けるために添字を使う．乱数の初期値は<span class="math inline">\(\hat{\theta} _1\)</span> である．</p>
+<div class="callout callout-style-default callout-warning callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+注意!!!
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p><span class="math inline">\(\hat{\theta}_1\)</span>や<span class="math inline">\(\hat{\theta}_2\)</span>には<strong>具体的な値</strong>が入る</p>
+</div>
+</div>
+<p>ここからは，事後分布がKernel(<span class="math inline">\(\theta\)</span>)に比例するということが重要になってくる． <span class="math display">\[
+f(\theta|D) \propto f(D|\theta)\ f(\theta) = \mbox{Kernel}(\theta)
+\]</span></p>
+<ol type="1">
+<li><p><span class="math inline">\(\hat{\theta}_1\)</span>を適当に決める．本当になんでも良い</p></li>
+<li><p>N(0, <span class="math inline">\(\sigma^2\)</span>)に従う乱数を，別に生成する</p></li>
+<li><p><span class="math inline">\(\hat{\theta}_1+\mbox{乱数}\)</span> の値を便宜上 <span class="math inline">\({ \hat { \theta }_2}^{\mbox{提案}}\)</span>とする</p></li>
+<li><p><span class="math inline">\(\frac{ \mbox{Kernel}({\hat{\theta}_2}^{\mbox{提案}})} {\mbox{Kernel}(\hat{\theta}_1)} = rate\)</span> を計算する</p>
+<ol type="1">
+<li>ここで少し解説をする.上記の計算式は<span class="math inline">\(f({\hat{\theta}_2}^{\mbox{提案}}|D)\)</span>と<span class="math inline">\(f({\hat{\theta}_1}|D)\)</span>という2つの事後確率分布の比を計算しているのである</li>
+<li>比をとることで共通の分母である正規化定数が消えるのである．</li>
+</ol></li>
+</ol>
+<p><span class="math display">\[
+\begin{aligned}
+\frac{f({\hat{\theta}_2}^{\mbox{提案}}|D)}{f({\hat{\theta}_1}|D)} &amp;= \frac{\frac{\mbox{Kernel}({\hat{\theta}_2}^{\mbox{提案}})}{\mbox{正規化定数}}}{\frac{\mbox{Kernel}({\hat{\theta}_1})}{\mbox{正規化定数}}}\\
+&amp;= \frac{\mbox{Kernel}({\hat{\theta}_2}^{\mbox{提案}})}{\mbox{Kernel}({\hat{\theta}_1})}\\
+&amp;=rate
+\end{aligned}
+\]</span></p>
+<ol start="5" type="1">
+<li><ol type="1">
+<li>もしもrateが1よりも高かったのであれば，それは提案されたパラメータの値 <span class="math inline">\(\hat{\theta}_2^{\mbox{提案}}\)</span>の方が密度が高かったということである．密度が高いということは，その値は比較的発生しやすい値であることを意味する．（1番発生しやすいであろう値(<span class="math inline">\(\theta\)</span>の期待値)に一歩近づいた)．なので<span class="math inline">\(\hat{\theta}_2^{\mbox{提案}}\)</span>は晴れて<span class="math inline">\(\hat{\theta}_2\)</span>になるのである．提案の文字が消えて，正式に乱数と認められた</li>
+<li>もしもrateが1よりも小さかったのであれば，
+<ul>
+<li>確率rateで<span class="math inline">\(\hat{\theta}_2^{\mbox{提案}}\)</span>が<span class="math inline">\(\hat{\theta}_2\)</span>になる</li>
+<li>確率(1-rate)で<span class="math inline">\({\hat{\theta}_1}\)</span>が<span class="math inline">\(\hat{\theta}_2\)</span>を兼任する(これらの措置をとることで，ある程度起こりやすそうな値が乱数として採用されやすいようになる)</li>
+</ul></li>
+</ol></li>
+</ol>
+<div class="callout callout-style-default callout-warning callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+再び注意!!!
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p><span class="math inline">\(\hat{\theta}_1\)</span>や<span class="math inline">\(\hat{\theta}_2\)</span>には<strong>具体的な値</strong>が入る．混乱しないように</p>
+</div>
+</div>
+<ol start="6" type="1">
+<li><p><span class="math inline">\(\hat{\theta}_2\)</span>を初期値として2.からの計算をもう一度行う</p></li>
+<li><p>これらを何度も行い，多数の乱数を得る．</p></li>
+</ol>
+<p><span class="math inline">\(\hat{\theta}_t\)</span>は一時点前の<span class="math inline">\(\hat{\theta}_{t-1}\)</span>に基づいて得られている．つまりはマルコフ連鎖の形になっている．</p>
+<p>せっかくなので，乱数生成を繰り返した結果を見てみよう(stanで)</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="co">#こんなデータが得られたとする</span></span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>y <span class="ot">&lt;-</span> <span class="fu">rnorm</span>(<span class="at">n =</span> <span class="dv">2024</span>,<span class="at">mean =</span> <span class="fl">2.71</span>, <span class="at">sd =</span> <span class="fl">3.14</span>)      <span class="co">#データの生成も乱数にした</span></span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>myd <span class="ot">&lt;-</span> y                                         <span class="co">#2024/7/20日変更</span></span>
+<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a>sample_size <span class="ot">&lt;-</span> <span class="fu">length</span>(y)</span>
+<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a>data_list <span class="ot">&lt;-</span> <span class="fu">list</span>(<span class="at">y =</span> y, <span class="at">N =</span> sample_size)</span>
+<span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-7"><a href="#cb19-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-8"><a href="#cb19-8" aria-hidden="true" tabindex="-1"></a><span class="co"># mcmcの実行</span></span>
+<span id="cb19-9"><a href="#cb19-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-10"><a href="#cb19-10" aria-hidden="true" tabindex="-1"></a><span class="co">#生成回数が50</span></span>
+<span id="cb19-11"><a href="#cb19-11" aria-hidden="true" tabindex="-1"></a>mcmc_result_50 <span class="ot">&lt;-</span> <span class="fu">stan</span>(</span>
+<span id="cb19-12"><a href="#cb19-12" aria-hidden="true" tabindex="-1"></a>  <span class="at">file =</span> <span class="st">"stan/1.stan"</span>,</span>
+<span id="cb19-13"><a href="#cb19-13" aria-hidden="true" tabindex="-1"></a>  <span class="at">data =</span> data_list,</span>
+<span id="cb19-14"><a href="#cb19-14" aria-hidden="true" tabindex="-1"></a>  <span class="at">seed =</span> <span class="dv">1</span>,</span>
+<span id="cb19-15"><a href="#cb19-15" aria-hidden="true" tabindex="-1"></a>  <span class="at">iter =</span> <span class="dv">50</span>,</span>
+<span id="cb19-16"><a href="#cb19-16" aria-hidden="true" tabindex="-1"></a>  <span class="at">chains =</span> <span class="dv">1</span></span>
+<span id="cb19-17"><a href="#cb19-17" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb19-18"><a href="#cb19-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-19"><a href="#cb19-19" aria-hidden="true" tabindex="-1"></a><span class="co">#生成回数が2000</span></span>
+<span id="cb19-20"><a href="#cb19-20" aria-hidden="true" tabindex="-1"></a>mcmc_result_2000 <span class="ot">&lt;-</span> <span class="fu">stan</span>(</span>
+<span id="cb19-21"><a href="#cb19-21" aria-hidden="true" tabindex="-1"></a>  <span class="at">file =</span> <span class="st">"stan/1.stan"</span>,</span>
+<span id="cb19-22"><a href="#cb19-22" aria-hidden="true" tabindex="-1"></a>  <span class="at">data =</span> data_list,</span>
+<span id="cb19-23"><a href="#cb19-23" aria-hidden="true" tabindex="-1"></a>  <span class="at">seed =</span> <span class="dv">1</span>,</span>
+<span id="cb19-24"><a href="#cb19-24" aria-hidden="true" tabindex="-1"></a>  <span class="at">iter =</span> <span class="dv">2000</span>,</span>
+<span id="cb19-25"><a href="#cb19-25" aria-hidden="true" tabindex="-1"></a>  <span class="at">chains =</span> <span class="dv">1</span></span>
+<span id="cb19-26"><a href="#cb19-26" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="callout callout-style-default callout-important callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+2024_7_20上記を修正
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<ul>
+<li>データ生成もシミュレーションの一部にして、ベイズ推定で正しいパラメタが推定できるかどうか確かめるとより良いですね。</li>
+</ul>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>trace1 <span class="ot">&lt;-</span> <span class="fu">traceplot</span>(mcmc_result_50</span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>          ,<span class="at">pars =</span> <span class="fu">c</span>(<span class="st">"mu"</span>),</span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>          <span class="at">inc_warmup =</span> T)</span>
+<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a>trace2 <span class="ot">&lt;-</span> <span class="fu">traceplot</span>(mcmc_result_2000,</span>
+<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a>          <span class="at">pars =</span> <span class="fu">c</span>(<span class="st">"mu"</span>),</span>
+<span id="cb20-6"><a href="#cb20-6" aria-hidden="true" tabindex="-1"></a>          <span class="at">inc_warmup =</span> T)</span>
+<span id="cb20-7"><a href="#cb20-7" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(trace1<span class="sc">/</span>trace2)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="Bayesian_theory_files/figure-html/unnamed-chunk-3-1.png" class="img-fluid figure-img" width="672"></p>
+<figcaption>MCMCによる乱数生成</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<p>定常分布に収束したとみて良いだろう．</p>
+</section>
+</section>
+<section id="stan" class="level1" data-number="3">
+<h1 data-number="3"><span class="header-section-number">3</span> stan</h1>
+<p>なにごとも実際にやってみないと実感できない．stanで乱数を生成し，その分布を見てみよう．</p>
+<section id="mcmcの実行" class="level3" data-number="3.0.1">
+<h3 data-number="3.0.1" class="anchored" data-anchor-id="mcmcの実行"><span class="header-section-number">3.0.1</span> MCMCの実行</h3>
+<p>正規分布を用いた確率モデルを想定する． <span class="math display">\[
+X \sim \mbox{Normal}(\theta,1)
+\]</span> <span class="math inline">\(\theta\)</span>を求めることを目標にする．</p>
+<p>まずはstanに統計モデルの情報を教えてあげる．(stanファイルに記述する)</p>
+<p>記述ができたらモデルをコンパイルする</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>mu_norm <span class="ot">&lt;-</span> <span class="fu">cmdstan_model</span>(<span class="st">"stan/1.stan"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>stanファイルの中身を見てみる</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>mu_norm<span class="sc">$</span><span class="fu">print</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>data {
+  int&lt;lower=0&gt; N;
+  vector[N] y;
+}
+
+parameters {
+  real mu;
+  real sigma;
+}
+
+model {
+  
+  //統計モデルの指定
+  y ~ normal(mu, sigma);
+}</code></pre>
+</div>
+</div>
+<p>以下のようなデータが得られたとする．</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a>y <span class="ot">&lt;-</span> <span class="fu">rnorm</span>(<span class="at">n =</span> <span class="dv">2024</span>,<span class="at">mean =</span> <span class="fl">2.71</span>, <span class="at">sd =</span> <span class="fl">3.14</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>このデータをstanに渡すためにlist形式にする．ついでに事前分布の指定もする</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a>list <span class="ot">&lt;-</span> <span class="fu">list</span>(<span class="at">N =</span> <span class="fu">length</span>(y),</span>
+<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a>               <span class="at">y =</span> y)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>これらのデータをstanに渡して推定を行う．</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a>fit <span class="ot">&lt;-</span> mu_norm<span class="sc">$</span><span class="fu">sample</span>(</span>
+<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">data =</span> list,</span>
+<span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">seed =</span> <span class="dv">1</span>,</span>
+<span id="cb26-4"><a href="#cb26-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">chains =</span> <span class="dv">4</span>,</span>
+<span id="cb26-5"><a href="#cb26-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">refresh =</span> <span class="dv">1000</span>,</span>
+<span id="cb26-6"><a href="#cb26-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">iter_warmup =</span> <span class="dv">1000</span>,</span>
+<span id="cb26-7"><a href="#cb26-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">iter_sampling =</span> <span class="dv">3000</span></span>
+<span id="cb26-8"><a href="#cb26-8" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>結果を表示する</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb27"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="co">#mu</span></span>
+<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a>fit<span class="sc">$</span><span class="fu">summary</span>(<span class="st">"mu"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 1 × 10
+  variable  mean median     sd    mad    q5   q95  rhat ess_bulk ess_tail
+  &lt;chr&gt;    &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;    &lt;dbl&gt;    &lt;dbl&gt;
+1 mu        2.69   2.69 0.0702 0.0708  2.57  2.80  1.00    8673.    7719.</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb29"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="co">#sigma</span></span>
+<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a>fit<span class="sc">$</span><span class="fu">summary</span>(<span class="st">"sigma"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 1 × 10
+  variable  mean median     sd    mad    q5   q95  rhat ess_bulk ess_tail
+  &lt;chr&gt;    &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;    &lt;dbl&gt;    &lt;dbl&gt;
+1 sigma     3.21   3.21 0.0508 0.0503  3.12  3.29  1.00    9243.    7396.</code></pre>
+</div>
+</div>
+</section>
+<section id="可視化" class="level3" data-number="3.0.2">
+<h3 data-number="3.0.2" class="anchored" data-anchor-id="可視化"><span class="header-section-number">3.0.2</span> 可視化</h3>
+<p>MCMCの役割は事後分布に従う乱数を生成することであった．まずはその乱数を取り出す</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb31"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a>post <span class="ot">&lt;-</span> fit<span class="sc">$</span><span class="fu">draws</span>() <span class="sc">|&gt;</span> </span>
+<span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">as_draws_df</span>()</span>
+<span id="cb31-3"><a href="#cb31-3" aria-hidden="true" tabindex="-1"></a><span class="fu">glimpse</span>(post)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Rows: 12,000
+Columns: 6
+$ lp__       &lt;dbl&gt; -3369.52, -3369.40, -3368.71, -3368.78, -3370.23, -3369.62,…
+$ mu         &lt;dbl&gt; 2.70253, 2.78662, 2.67426, 2.66485, 2.63529, 2.66790, 2.573…
+$ sigma      &lt;dbl&gt; 3.13191, 3.20665, 3.16922, 3.16674, 3.29324, 3.28062, 3.179…
+$ .chain     &lt;int&gt; 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,…
+$ .iteration &lt;int&gt; 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, …
+$ .draw      &lt;int&gt; 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, …</code></pre>
+</div>
+</div>
+<p>こうすることで事後分布から取り出した乱数をデータフレームに格納することができた．</p>
+<p>分布が本当に収束しているのか視覚的に理解するために，トレースプロットを作る</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb33"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a><span class="co">#mu</span></span>
+<span id="cb33-2"><a href="#cb33-2" aria-hidden="true" tabindex="-1"></a>trace1 <span class="ot">&lt;-</span> <span class="fu">ggplot</span>(post,</span>
+<span id="cb33-3"><a href="#cb33-3" aria-hidden="true" tabindex="-1"></a>                <span class="fu">aes</span>(<span class="at">x =</span> .iteration,</span>
+<span id="cb33-4"><a href="#cb33-4" aria-hidden="true" tabindex="-1"></a>                    <span class="at">y =</span> mu,</span>
+<span id="cb33-5"><a href="#cb33-5" aria-hidden="true" tabindex="-1"></a>                    <span class="at">group =</span> <span class="fu">as.factor</span>(.chain))) <span class="sc">+</span> </span>
+<span id="cb33-6"><a href="#cb33-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="fu">aes</span>(<span class="at">colour =</span> <span class="fu">as.factor</span>(.chain)))<span class="sc">+</span></span>
+<span id="cb33-7"><a href="#cb33-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ylab</span>(<span class="st">"mu"</span>) <span class="sc">+</span></span>
+<span id="cb33-8"><a href="#cb33-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">xlab</span>(<span class="st">"実行回数"</span>)</span>
+<span id="cb33-9"><a href="#cb33-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb33-10"><a href="#cb33-10" aria-hidden="true" tabindex="-1"></a><span class="co">#sigma</span></span>
+<span id="cb33-11"><a href="#cb33-11" aria-hidden="true" tabindex="-1"></a>trace2 <span class="ot">&lt;-</span> <span class="fu">ggplot</span>(post,</span>
+<span id="cb33-12"><a href="#cb33-12" aria-hidden="true" tabindex="-1"></a>                <span class="fu">aes</span>(<span class="at">x =</span> .iteration,</span>
+<span id="cb33-13"><a href="#cb33-13" aria-hidden="true" tabindex="-1"></a>                    <span class="at">y =</span> sigma,</span>
+<span id="cb33-14"><a href="#cb33-14" aria-hidden="true" tabindex="-1"></a>                    <span class="at">group =</span> <span class="fu">as.factor</span>(.chain))) <span class="sc">+</span> </span>
+<span id="cb33-15"><a href="#cb33-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="fu">aes</span>(<span class="at">colour =</span> <span class="fu">as.factor</span>(.chain)))<span class="sc">+</span></span>
+<span id="cb33-16"><a href="#cb33-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ylab</span>(<span class="st">"sigam"</span>) <span class="sc">+</span></span>
+<span id="cb33-17"><a href="#cb33-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">xlab</span>(<span class="st">"実行回数"</span>)</span>
+<span id="cb33-18"><a href="#cb33-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb33-19"><a href="#cb33-19" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(trace1<span class="sc">/</span>trace2)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="Bayesian_theory_files/figure-html/unnamed-chunk-11-1.png" class="img-fluid figure-img" width="672"></p>
+<figcaption>トレースプロットの図示</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<p>毛虫になったので問題なし．</p>
+<p><span class="math inline">\(\theta\)</span>の事後分布を確認しよう</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb34"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a><span class="co">#mu</span></span>
+<span id="cb34-2"><a href="#cb34-2" aria-hidden="true" tabindex="-1"></a>plt1 <span class="ot">&lt;-</span> <span class="fu">ggplot</span>(post,</span>
+<span id="cb34-3"><a href="#cb34-3" aria-hidden="true" tabindex="-1"></a>              <span class="fu">aes</span>(<span class="at">x =</span> mu,</span>
+<span id="cb34-4"><a href="#cb34-4" aria-hidden="true" tabindex="-1"></a>                  <span class="at">y =</span> <span class="fu">after_stat</span>(density))) <span class="sc">+</span></span>
+<span id="cb34-5"><a href="#cb34-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_histogram</span>(<span class="at">colour =</span> <span class="st">"black"</span>)<span class="sc">+</span></span>
+<span id="cb34-6"><a href="#cb34-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="fu">expression</span>(mu),</span>
+<span id="cb34-7"><a href="#cb34-7" aria-hidden="true" tabindex="-1"></a>       <span class="at">y =</span> <span class="st">"事後確率密度"</span>)<span class="sc">+</span></span>
+<span id="cb34-8"><a href="#cb34-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_vline</span>(<span class="at">xintercept =</span> <span class="fl">2.71</span>,</span>
+<span id="cb34-9"><a href="#cb34-9" aria-hidden="true" tabindex="-1"></a>             <span class="at">color =</span> <span class="st">"red"</span>)</span>
+<span id="cb34-10"><a href="#cb34-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb34-11"><a href="#cb34-11" aria-hidden="true" tabindex="-1"></a><span class="co">#sigma</span></span>
+<span id="cb34-12"><a href="#cb34-12" aria-hidden="true" tabindex="-1"></a>plt2 <span class="ot">&lt;-</span> <span class="fu">ggplot</span>(post,</span>
+<span id="cb34-13"><a href="#cb34-13" aria-hidden="true" tabindex="-1"></a>              <span class="fu">aes</span>(<span class="at">x =</span> sigma,</span>
+<span id="cb34-14"><a href="#cb34-14" aria-hidden="true" tabindex="-1"></a>                  <span class="at">y =</span> <span class="fu">after_stat</span>(density))) <span class="sc">+</span></span>
+<span id="cb34-15"><a href="#cb34-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_histogram</span>(<span class="at">colour =</span> <span class="st">"black"</span>)<span class="sc">+</span></span>
+<span id="cb34-16"><a href="#cb34-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="fu">expression</span>(sigma),</span>
+<span id="cb34-17"><a href="#cb34-17" aria-hidden="true" tabindex="-1"></a>       <span class="at">y =</span> <span class="st">"事後確率密度"</span>)<span class="sc">+</span></span>
+<span id="cb34-18"><a href="#cb34-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_vline</span>(<span class="at">xintercept =</span> <span class="fl">3.14</span>,</span>
+<span id="cb34-19"><a href="#cb34-19" aria-hidden="true" tabindex="-1"></a>             <span class="at">color =</span> <span class="st">"red"</span>)</span>
+<span id="cb34-20"><a href="#cb34-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb34-21"><a href="#cb34-21" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(plt1<span class="sc">/</span>plt2)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="Bayesian_theory_files/figure-html/unnamed-chunk-12-1.png" class="img-fluid figure-img" width="672"></p>
+<figcaption>事後分布の確認</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<p>ちょっとズレる．</p>
+<p>このサンプル(乱数)を使うことで平均や信用区間を求めることができる．</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb35"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a><span class="co">#mu</span></span>
+<span id="cb35-2"><a href="#cb35-2" aria-hidden="true" tabindex="-1"></a><span class="co">#平均</span></span>
+<span id="cb35-3"><a href="#cb35-3" aria-hidden="true" tabindex="-1"></a><span class="fu">mean</span>(post<span class="sc">$</span>mu)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 2.688615</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb37"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a><span class="co">#mu</span></span>
+<span id="cb37-2"><a href="#cb37-2" aria-hidden="true" tabindex="-1"></a><span class="co">#95%信用区間</span></span>
+<span id="cb37-3"><a href="#cb37-3" aria-hidden="true" tabindex="-1"></a><span class="fu">quantile</span>(post<span class="sc">$</span>mu,<span class="at">probs =</span> <span class="fu">c</span>(<span class="fl">0.025</span>,<span class="fl">0.975</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>    2.5%    97.5% 
+2.552124 2.828042 </code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb39"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a><span class="co">#sigam</span></span>
+<span id="cb39-2"><a href="#cb39-2" aria-hidden="true" tabindex="-1"></a><span class="co">#平均</span></span>
+<span id="cb39-3"><a href="#cb39-3" aria-hidden="true" tabindex="-1"></a><span class="fu">mean</span>(post<span class="sc">$</span>sigma)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 3.206116</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb41"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb41-1"><a href="#cb41-1" aria-hidden="true" tabindex="-1"></a><span class="co">#sigma</span></span>
+<span id="cb41-2"><a href="#cb41-2" aria-hidden="true" tabindex="-1"></a><span class="co">#95%信用区間</span></span>
+<span id="cb41-3"><a href="#cb41-3" aria-hidden="true" tabindex="-1"></a><span class="fu">quantile</span>(post<span class="sc">$</span>sigma,<span class="at">probs =</span> <span class="fu">c</span>(<span class="fl">0.025</span>,<span class="fl">0.975</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>    2.5%    97.5% 
+3.110089 3.309264 </code></pre>
+</div>
+</div>
+<p>分布は少しずれていたが，平均と信用区間をみるとかなり近い値が出ている．</p>
+</section>
+</section>
+<section id="補足-信頼区間と予測区間の違い" class="level1" data-number="4">
+<h1 data-number="4"><span class="header-section-number">4</span> 補足&nbsp;信頼区間と予測区間の違い</h1>
+<section id="ベイズ信頼区間75119129" class="level3" data-number="4.0.1">
+<h3 data-number="4.0.1" class="anchored" data-anchor-id="ベイズ信頼区間75119129"><span class="header-section-number">4.0.1</span> ベイズ信頼区間[75,119,129]</h3>
+<p><strong>事後分布に従う乱数</strong>を小さいものから順番に並べて，2.5%点から97.5%点に該当する範囲を並べることで求める．</p>
+</section>
+<section id="予測区間137178" class="level3" data-number="4.0.2">
+<h3 data-number="4.0.2" class="anchored" data-anchor-id="予測区間137178"><span class="header-section-number">4.0.2</span> 予測区間[137,178]</h3>
+<p>データDが与えられた時の，将来的な観測値<strong>pred<a href="#fn2" class="footnote-ref" id="fnref2" role="doc-noteref"><sup>2</sup></a>が従う確率分布の確率質量関数</strong>を<span class="math inline">\(f(pred|D)\)</span>とする．これが予測分布である．例えば，パラメータ<span class="math inline">\(\theta\)</span>が与えられた時の観測値predの確率分布の確率質量関数は <span class="math inline">\(f(pred|\theta)\)</span>となる．この確率質量(密度)関数はポアソン分布かもしれないし，正規分布かもしれない．<span class="math inline">\(\theta\)</span>の事後分布の確率密度関数を<span class="math inline">\(f(\theta|D)\)</span>とおくと，予測分布は以下のように求められる</p>
+$$
+<span class="math display">\[\begin{aligned}
+f(pred|D) &amp;= \int f(pred|\theta)f(\theta|D) d\theta\\
+
+\mbox{予測分布} &amp;= \int (\theta\mbox{が与えられてたときに}pred\mbox{が従う分布})(\theta\mbox{の事後分布})d\theta
+\end{aligned}\]</span>
+<p>$$ この計算はめんどくさいので，mcmcを活用する．まずは<span class="math inline">\(\theta\)</span>のMCMCサンプルを得る．そして，<span class="math inline">\(\theta\)</span>のMCMCサンプルを母数とした確率分布(ポアソン，正規，etc,,,)に従う乱数を得る．この乱数こそが観測値predのMCMCサンプルになる．</p>
+</section>
+</section>
+
+
+<div id="quarto-appendix" class="default"><section id="footnotes" class="footnotes footnotes-end-of-document" role="doc-endnotes"><h2 class="anchored quarto-appendix-heading">Footnotes</h2>
+
+<ol>
+<li id="fn1"><p>感度分析に関する記述は教科書の2部6章にある<a href="#fnref1" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn2"><p>　predはprediction(予測)の略<a href="#fnref2" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+</ol>
+</section></div></main>
+<!-- /main column -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+        const codeEl = trigger.previousElementSibling.cloneNode(true);
+        for (const childEl of codeEl.children) {
+          if (isCodeAnnotation(childEl)) {
+            childEl.remove();
+          }
+        }
+        return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+</div> <!-- /content -->
+
+
+
+
+</body></html>
