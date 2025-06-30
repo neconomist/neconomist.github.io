@@ -82,3 +82,14 @@ body {
 .site-footer .footer-inner a:hover {
   text-decoration: underline;
 }
+
+@media screen and (max-width: 600px) {
+  .site-header .container {
+    flex-direction: column;
+    align-items: center; /* 中央揃え */
+  }
+  .site-nav {
+    margin-top: 0.5em;
+  }
+}
+
