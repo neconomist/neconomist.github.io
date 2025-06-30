@@ -82,3 +82,14 @@ body {
 .site-footer .footer-inner a:hover {
   text-decoration: underline;
 }
+
+.site-header .container {
+  display: block;
+  padding: 1em;
+}
+
+/* タブを右寄せ */
+.site-nav {
+  text-align: right;
+  margin-top: 0.5em;
+}
