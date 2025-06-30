@@ -12,3 +12,5 @@ permalink: /notes/
   - 本当は手動でしたかったけど，最適化が上手くいかなかったのでpackage使ってます
  
 - [Bayes theory](/notes/Bayesian_theory.html)
+  - ありがたいことに，指導教官からの赤が入ってます
+  - それでも間違いやわかりにくい部分はあるでしょう
