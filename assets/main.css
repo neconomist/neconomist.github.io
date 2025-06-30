@@ -8,23 +8,23 @@ body {
 .container {
   max-width: 960px;
   margin: 0 auto;
-  padding: 0; /* 余白を完全になくす */
+  padding: 0; /* 余白なし */
 }
 
 /* ヘッダー */
 .site-header {
   background: #000;
   color: white;
-  padding: 0; /* 上下余白なし */
 }
 
 .site-header .container {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 0.5em 1em; /* 内側に少しだけ余白（見やすさのため） */
+  padding: 0.5em 1em;
 }
 
+/* タイトル */
 .site-header h1 {
   margin: 0;
   font-size: 1.8em;
@@ -53,25 +53,22 @@ body {
   border-radius: 4px;
 }
 
-/* コンテンツ */
-.page-content .container {
+/* コンテンツボックス */
+.page-content {
   background: white;
-  border: 1px solid #ccc;
-  border-radius: 0; /* 角丸も消す */
-  padding: 2em;
-  box-shadow: none; /* 影も消す */
-  margin: 0; /* 完全に余白をなくす */
+  border-top: 1px solid #ccc;
+  border-bottom: 1px solid #ccc;
+  padding: 2em 0;
 }
 
 /* フッター */
 .site-footer {
   background: #444;
   color: white;
-  padding: 0;
 }
 
 .site-footer .container {
   text-align: right;
   font-size: 0.9em;
-  padding: 0.5em 1em; /* 内側余白だけ */
+  padding: 0.5em 1em;
 }
