@@ -1,5 +1,5 @@
 body {
-  background: white; /* 元に戻す */
+  background: #eee;
 }
 
 .site-nav {
@@ -26,4 +26,11 @@ body {
   max-width: 800px;
   margin: 0 auto;
   padding: 0 1em;
+}
+
+.page-content .wrapper {
+  background: white;      /* 箱の背景色 */
+  border: 1px solid #ccc; /* 枠線 */
+  padding: 2em;           /* 内側の余白 */
+  box-shadow: 0 0 10px rgba(0,0,0,0.1); /* うっすら影（オシャレ） */
 }
