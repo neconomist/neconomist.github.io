@@ -21,7 +21,10 @@
         {{ content }}
       </main>
       <footer class="site-footer">
-        &copy; {{ site.time | date: "%Y" }} {{ site.title }}
+        <div class="footer-inner">
+          <a href="https://x.com/あなたのアカウント" target="_blank" rel="noopener">X (Twitter)</a>
+          <span>&copy; {{ site.time | date: "%Y" }} {{ site.title }}</span>
+        </div>
       </footer>
     </div>
   </body>
