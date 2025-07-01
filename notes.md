@@ -19,3 +19,6 @@ permalink: /notes/
  
 
 - [Regression and Loss](https://ivory-variraptor-cfc.notion.site/1d588be4f78980b9a34bfb458413a2d8)
+
+
+- [Moment and Fisher](https://ivory-variraptor-cfc.notion.site/Fisher-1ba88be4f78980b995f3f9ac82a5dfdc)
