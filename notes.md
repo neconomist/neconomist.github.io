@@ -16,3 +16,6 @@ permalink: /notes/
 - [Bayes theory](/notes/Bayesian_theory.html)
   - ありがたいことに，指導教官からの赤が入ってます
   - それでも間違いやわかりにくい部分はあるでしょう
+ 
+
+- [Regression and Loss](https://ivory-variraptor-cfc.notion.site/1d588be4f78980b9a34bfb458413a2d8)
