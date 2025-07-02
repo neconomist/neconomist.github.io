@@ -1,5 +1,8 @@
 ---
 title: "Entropy Balancing"
+subtitle: "原理と実装"
+author: "ネコノミスト"
+date: today
 format:
   html:
     toc: true          # ✅ ページ右側に目次を表示
