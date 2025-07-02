@@ -166,9 +166,9 @@ window.Quarto = {
   <li><a href="#mcmcの実行" id="toc-mcmcの実行"><span class="header-section-number">3.0.1</span> MCMCの実行</a></li>
   <li><a href="#可視化" id="toc-可視化"><span class="header-section-number">3.0.2</span> 可視化</a></li>
   </ul></li>
-  <li><a href="#補足-信頼区間と予測区間の違い" id="toc-補足-信頼区間と予測区間の違い"><span class="header-section-number">4</span> 補足&nbsp;信頼区間と予測区間の違い</a>
+  <li><a href="#補足-信用区間と予測区間の違い" id="toc-補足-信用区間と予測区間の違い"><span class="header-section-number">4</span> 補足&nbsp;信用区間と予測区間の違い</a>
   <ul>
-  <li><a href="#ベイズ信頼区間75119129" id="toc-ベイズ信頼区間75119129"><span class="header-section-number">4.0.1</span> ベイズ信頼区間[75,119,129]</a></li>
+  <li><a href="#信用区間75119129" id="toc-信用区間75119129"><span class="header-section-number">4.0.1</span> 信用区間[75,119,129]</a></li>
   <li><a href="#予測区間137178" id="toc-予測区間137178"><span class="header-section-number">4.0.2</span> 予測区間[137,178]</a></li>
   </ul></li>
   </ul>
@@ -211,7 +211,7 @@ P(\theta|D) &amp;= \frac{P(D|\theta)P(\theta)}{P(D)}\\
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<p>わかりやすやを重視して式変形の順序を逆にしている</p>
+<p>わかりやすさを重視して式変形の順序を逆にしている</p>
 </div>
 </div>
 <p>このような変形<span class="math inline">\((\sum_{y}p(x,y) = p(x))\)</span>を<strong>周辺化</strong>と呼ぶ．</p>
@@ -365,7 +365,7 @@ f(\theta|D)  &amp; \propto f(D|\theta)f(\theta)\\
 <p>分母たる周辺尤度を無視しているのは2つ理由がある．</p>
 <ol type="1">
 <li><p>周辺尤度の計算がめんどくさい</p></li>
-<li><p>周辺尤度を直接求めなくても良い理由があるs</p></li>
+<li><p>周辺尤度を直接求めなくても良い理由がある</p></li>
 </ol>
 </section>
 <section id="正規化定数" class="level2" data-number="1.4">
@@ -392,7 +392,7 @@ f(\theta|D)  &amp; \propto f(D|\theta)f(\theta)\\
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<p>わかりやすやを重視して式変形の順序を逆にしている</p>
+<p>わかりやすさを重視して式変形の順序を逆にしている</p>
 </div>
 </div>
 <p><span class="math inline">\(\int_{-\infty}^{\infty} f(D|\theta)f(\theta)d\theta\)</span>を計算するのは非常に困難である．積分計算によって<span class="math inline">\(\theta\)</span>が消えるためもはや<span class="math inline">\(\theta\)</span>の関数ではなく，データと確率モデルが与えられた後には定数になる．</p>
@@ -423,7 +423,7 @@ f(\theta|D) &amp;= \frac{f(D|\theta)f(\theta)}{f(D)}\\
 <p>「読んで字の如く<strong>正規化</strong>をしてくれるのである．正規化とは事後確率分布の確率密度関数の積分値が1になるように調整することであり．周辺尤度関数(<span class="math inline">\(f(D)\)</span>)を計算することで正規化ができる．」</p>
 </div>
 </div>
-<p>ここで，事後確率分布の確率密後関数を用いて「パラメータ<span class="math inline">\(\Theta\)</span>がaからBの範囲に入る確率」を計算したいとする．つまり <span class="math display">\[
+<p>ここで，事後確率分布の確率密後関数を用いて「パラメータ<span class="math inline">\(\Theta\)</span>がaからbの範囲に入る確率」を計算したいとする．つまり <span class="math display">\[
 \begin{aligned}
 P(a \leq \Theta \leq b )
 &amp;= \int_{a}^{b} f(\theta|D) d\theta\\
@@ -913,10 +913,10 @@ $ .draw      &lt;int&gt; 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 
 <p>分布は少しずれていたが，平均と信用区間をみるとかなり近い値が出ている．</p>
 </section>
 </section>
-<section id="補足-信頼区間と予測区間の違い" class="level1" data-number="4">
-<h1 data-number="4"><span class="header-section-number">4</span> 補足&nbsp;信頼区間と予測区間の違い</h1>
-<section id="ベイズ信頼区間75119129" class="level3" data-number="4.0.1">
-<h3 data-number="4.0.1" class="anchored" data-anchor-id="ベイズ信頼区間75119129"><span class="header-section-number">4.0.1</span> ベイズ信頼区間[75,119,129]</h3>
+<section id="補足-信用区間と予測区間の違い" class="level1" data-number="4">
+<h1 data-number="4"><span class="header-section-number">4</span> 補足&nbsp;信用区間と予測区間の違い</h1>
+<section id="信用区間75119129" class="level3" data-number="4.0.1">
+<h3 data-number="4.0.1" class="anchored" data-anchor-id="信用区間75119129"><span class="header-section-number">4.0.1</span> 信用区間[75,119,129]</h3>
 <p><strong>事後分布に従う乱数</strong>を小さいものから順番に並べて，2.5%点から97.5%点に該当する範囲を並べることで求める．</p>
 </section>
 <section id="予測区間137178" class="level3" data-number="4.0.2">
