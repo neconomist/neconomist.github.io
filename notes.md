@@ -8,12 +8,12 @@ permalink: /notes/
 ## ここでは非常に正確性に欠けた議論をしています．ご了承ください
 
 ### エントロピーバランシング
-- [Entropy Balancing](/notes/entropy_balancing.html)
+- [Entropy Balancing](/notes/entropy/entropy_balancing.html)
   - エントロピーバランシングの理論の確認と実装までをしています
   - 本当は手動でしたかったけど，最適化が上手くいかなかったのでpackage使ってます
 
 ### ベイズの定理と用語
-- [Bayes theory](/notes/Bayesian_theory.html)
+- [Bayes theory](/notes/bayes/Bayesian_theory.html)
   - ありがたいことに，指導教官からの赤が入ってます
   - それでも間違いやわかりにくい部分はあるでしょう
   - stanやRのコードが少ないので，いつか追加します
@@ -35,3 +35,9 @@ permalink: /notes/
   - いつかRで実装したいが，アルゴリズムがめんどくてできない
   - 部分識別，画期的なのに普及しない理由を痛感してしまった
   - 構造推定における部分識別は割とメジャーなイメージがあるので，実装も簡単なのかな？？？
+
+
+### 単回帰における信頼集合
+- [Confidence set](/notes/coef_set/conf_set.html)
+  - ブートストラップを用いて，推定量を5000組ゲットし，可視化
+  - そこに，95％信頼区間に相当する楕円を描いている
